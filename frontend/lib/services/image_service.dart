@@ -5,6 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Result of a permission check
+enum PermissionResult { granted, denied, permanentlyDenied }
+
 /// Service for handling image selection and camera capture
 class ImageService {
   final ImagePicker _picker = ImagePicker();
@@ -25,27 +28,52 @@ class ImageService {
   List<CameraDescription>? get cameras => _cameras;
 
   /// Check and request permissions (mobile only)
-  Future<bool> checkAndRequestPermissions({required bool forCamera}) async {
+  Future<PermissionResult> checkAndRequestPermissions({
+    required bool forCamera,
+  }) async {
     if (kIsWeb || (!Platform.isIOS && !Platform.isAndroid)) {
-      return true; // Permissions handled differently or not required on these platforms
+      return PermissionResult.granted;
     }
 
     if (forCamera) {
       final status = await Permission.camera.request();
-      if (status.isDenied || status.isPermanentlyDenied) {
-        return false;
-      }
+      return _mapStatusToResult(status);
     } else {
-      // For Gallery/Photo Library
-      final status = Platform.isIOS
-          ? await Permission.photos.request()
-          : await Permission.storage.request();
+      if (Platform.isAndroid) {
+        // For Android 13+ (API 33), we need Permission.photos (READ_MEDIA_IMAGES)
+        // For older Android, we need Permission.storage (READ_EXTERNAL_STORAGE)
 
-      if (status.isDenied || status.isPermanentlyDenied) {
-        return false;
+        // Try requesting photos first (Android 13+)
+        var status = await Permission.photos.request();
+
+        if (status.isGranted) {
+          return PermissionResult.granted;
+        }
+
+        // if denied or not supported (old Android), try storage
+        if (status.isDenied || status.isLimited) {
+          status = await Permission.storage.request();
+        }
+
+        return _mapStatusToResult(status);
+      } else {
+        // iOS or other mobile
+        final status =
+            await (Platform.isIOS ? Permission.photos : Permission.storage)
+                .request();
+        return _mapStatusToResult(status);
       }
     }
-    return true;
+  }
+
+  PermissionResult _mapStatusToResult(PermissionStatus status) {
+    if (status.isGranted || status.isLimited) {
+      return PermissionResult.granted;
+    } else if (status.isPermanentlyDenied) {
+      return PermissionResult.permanentlyDenied;
+    } else {
+      return PermissionResult.denied;
+    }
   }
 
   /// Pick image from gallery (works on all platforms)
@@ -86,15 +114,24 @@ class ImageService {
   }
 
   /// Pick image using file picker (alternative for desktop/web)
-  Future<String?> pickImageWithFilePicker() async {
+  Future<dynamic> pickImageWithFilePicker() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         allowMultiple: false,
+        withData: kIsWeb, // Crucial for Web to get bytes
       );
 
       if (result != null) {
-        return result.files.single.path;
+        if (kIsWeb) {
+          final bytes = result.files.single.bytes;
+          if (bytes == null) {
+            debugPrint('Error: No bytes available for picked file on Web');
+            return null;
+          }
+          return bytes; // Returns Uint8List
+        }
+        return result.files.single.path; // Returns String (path)
       }
       return null;
     } catch (e) {
@@ -107,15 +144,16 @@ class ImageService {
   /// Uses appropriate method based on platform
   Future<dynamic> selectImage({bool fromCamera = false}) async {
     if (kIsWeb) {
-      // Web: use file picker
+      // Web: use file picker and return bytes
       return await pickImageWithFilePicker();
     } else if (Platform.isIOS || Platform.isAndroid) {
       // Mobile: check permissions first
-      final hasPermission = await checkAndRequestPermissions(
-        forCamera: fromCamera,
-      );
-      if (!hasPermission) {
-        throw Exception('Permission denied');
+      final result = await checkAndRequestPermissions(forCamera: fromCamera);
+
+      if (result == PermissionResult.permanentlyDenied) {
+        throw Exception('PERMISSION_PERMANENTLY_DENIED');
+      } else if (result == PermissionResult.denied) {
+        throw Exception('PERMISSION_DENIED');
       }
 
       // Mobile: use image picker with camera option

@@ -1,12 +1,14 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../services/image_service.dart';
 import '../utils/responsive_helper.dart';
+import '../core/theme/app_colors.dart';
+import '../core/constants/app_constants.dart';
 import 'image_preview_screen.dart';
+import 'permission_error_screen.dart';
+import '../widgets/drag_drop_zone.dart';
 
 /// Enum to track the current loading state of individual actions
 enum HomeActionState { none, uploading, capturing }
@@ -31,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _initializeService();
 
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: AppConstants.slowAnimation,
       vsync: this,
     );
     _fadeAnimation = CurvedAnimation(
@@ -62,43 +64,57 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final result = await _imageService.selectImage(fromCamera: fromCamera);
 
       if (result != null && mounted) {
+        final dynamic source;
+        if (kIsWeb) {
+          source = result as Uint8List;
+        } else if (result is XFile) {
+          source = File(result.path);
+        } else if (result is String) {
+          source = File(result);
+        } else {
+          source = result;
+        }
+
         Navigator.push(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                ImagePreviewScreen(
-                  imageSource: result is XFile
-                      ? File(result.path)
-                      : File(result),
-                ),
+                ImagePreviewScreen(imageSource: source),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
                 },
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: AppConstants.mediumAnimation,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        final message = e.toString().contains('Permission denied')
-            ? 'Permission is required to access the ${fromCamera ? 'camera' : 'gallery'}. Please enable it in settings.'
-            : 'Error selecting image: $e';
+        final errorString = e.toString();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-            action: e.toString().contains('Permission denied')
-                ? SnackBarAction(
-                    label: 'Settings',
-                    textColor: Colors.white,
-                    onPressed: () => openAppSettings(),
-                  )
-                : null,
-          ),
-        );
+        if (errorString.contains('PERMISSION_PERMANENTLY_DENIED') ||
+            errorString.contains('PERMISSION_DENIED')) {
+          // Strictly redirect to error screen as requested
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PermissionErrorScreen(
+                permissionName: fromCamera ? 'Camera' : 'Storage/Photos',
+                description: fromCamera
+                    ? 'The app cannot capture X-rays without camera access.'
+                    : 'The app cannot upload X-rays without storage access.',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {
@@ -107,181 +123,222 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _handleFileDrop(List<dynamic> droppedFiles) async {
+    if (droppedFiles.isEmpty) return;
+
+    final file = droppedFiles.first;
+    dynamic source;
+
+    if (kIsWeb) {
+      // In desktop_drop on web, 'file' is a CrossFile (XFile)
+      // but we need to fetch bytes explicitly
+      final bytes = await file.readAsBytes();
+      source = bytes as Uint8List;
+    } else {
+      source = File(file.path);
+    }
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              ImagePreviewScreen(imageSource: source),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: AppConstants.mediumAnimation,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final isMobile = ResponsiveHelper.isMobile(context);
     final isWide = !isMobile;
     final isPlatformMobile = ResponsiveHelper.isPlatformMobile();
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Subtle Background Pattern
-          Positioned.fill(
-            child: CustomPaint(
-              painter: MedicalBackgroundPainter(
-                color: colorScheme.primary.withOpacity(0.04),
-                isDarkMode: theme.brightness == Brightness.dark,
+      backgroundColor: theme.brightness == Brightness.dark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
+      body: DragDropZone(
+        onFilesDropped: _handleFileDrop,
+        child: Stack(
+          children: [
+            // Subtle Background Pattern
+            Positioned.fill(
+              child: CustomPaint(
+                painter: MedicalBackgroundPainter(
+                  color: AppColors.primary.withOpacity(0.04),
+                  isDarkMode: theme.brightness == Brightness.dark,
+                ),
               ),
             ),
-          ),
 
-          // Main Content
-          SafeArea(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: ResponsiveHelper.getMaxContentWidth(context),
-                    ),
-                    padding: ResponsiveHelper.getResponsivePadding(context),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // App Icon/Logo
-                        _buildAnimatedLogo(colorScheme, isMobile),
+            // Main Content
+            SafeArea(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppConstants.maxContentWidth,
+                      ),
+                      padding: ResponsiveHelper.getResponsivePadding(context),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // App Icon/Logo
+                          _buildAnimatedLogo(isMobile),
 
-                        SizedBox(height: isMobile ? 32 : 48),
+                          const SizedBox(
+                            height: AppConstants.paddingExtraLarge,
+                          ),
 
-                        // Title
-                        ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [
-                              colorScheme.primary,
-                              colorScheme.secondary,
-                            ],
-                          ).createShader(bounds),
-                          child: Text(
-                            'Chest X-Ray Analysis',
-                            style: theme.textTheme.headlineLarge?.copyWith(
+                          // Title
+                          ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: AppColors.primaryGradient,
+                            ).createShader(bounds),
+                            child: Text(
+                              AppConstants.homeTitle,
+                              style: theme.textTheme.headlineLarge?.copyWith(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                      context,
+                                      38,
+                                    ),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -1.5,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+
+                          const SizedBox(height: AppConstants.paddingMedium),
+
+                          // Subtitle
+                          Text(
+                            AppConstants.homeSubtitle,
+                            style: theme.textTheme.bodyLarge?.copyWith(
                               fontSize: ResponsiveHelper.getResponsiveFontSize(
                                 context,
-                                38,
+                                18,
                               ),
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -1.5,
-                              color: Colors.white,
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.7,
+                              ),
+                              fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                        ),
 
-                        SizedBox(height: isMobile ? 12 : 16),
+                          const SizedBox(height: 72),
 
-                        // Subtitle
-                        Text(
-                          'Advanced artificial intelligence for medical diagnostic imaging',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: ResponsiveHelper.getResponsiveFontSize(
-                              context,
-                              18,
-                            ),
-                            color: colorScheme.onSurface.withOpacity(0.7),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        SizedBox(height: isMobile ? 48 : 72),
-
-                        // Upload/Capture Options (Optimized for Screen Width)
-                        if (isWide && isPlatformMobile)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildPrimaryActionCard(
+                          // Upload/Capture Options (Optimized for Screen Width)
+                          if (isWide && isPlatformMobile)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildPrimaryActionCard(
+                                    context: context,
+                                    icon: Icons.upload_file_rounded,
+                                    title: 'Gallery Upload',
+                                    description: 'Import from device storage',
+                                    onTap: () => _handleImageSelection(
+                                      fromCamera: false,
+                                    ),
+                                    isLoading:
+                                        _activeAction ==
+                                        HomeActionState.uploading,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: AppConstants.paddingLarge,
+                                ),
+                                Expanded(
+                                  child: _buildPrimaryActionCard(
+                                    context: context,
+                                    icon: Icons.camera_enhance_rounded,
+                                    title: 'Live Capture',
+                                    description: 'Capture via device camera',
+                                    onTap: () =>
+                                        _handleImageSelection(fromCamera: true),
+                                    isLoading:
+                                        _activeAction ==
+                                        HomeActionState.capturing,
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            Column(
+                              children: [
+                                _buildPrimaryActionCard(
                                   context: context,
                                   icon: Icons.upload_file_rounded,
-                                  title: 'Gallery Upload',
-                                  description: 'Import from device storage',
+                                  title: 'Upload X-Ray',
+                                  description: 'Select an image from gallery',
                                   onTap: () =>
                                       _handleImageSelection(fromCamera: false),
                                   isLoading:
                                       _activeAction ==
                                       HomeActionState.uploading,
-                                  color: colorScheme.primary,
+                                  color: AppColors.primary,
                                 ),
-                              ),
-                              const SizedBox(width: 24),
-                              Expanded(
-                                child: _buildPrimaryActionCard(
-                                  context: context,
-                                  icon: Icons.camera_enhance_rounded,
-                                  title: 'Live Capture',
-                                  description: 'Capture via device camera',
-                                  onTap: () =>
-                                      _handleImageSelection(fromCamera: true),
-                                  isLoading:
-                                      _activeAction ==
-                                      HomeActionState.capturing,
-                                  color: colorScheme.secondary,
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Column(
-                            children: [
-                              _buildPrimaryActionCard(
-                                context: context,
-                                icon: Icons.upload_file_rounded,
-                                title: 'Upload X-Ray',
-                                description: 'Select an image from gallery',
-                                onTap: () =>
-                                    _handleImageSelection(fromCamera: false),
-                                isLoading:
-                                    _activeAction == HomeActionState.uploading,
-                                color: colorScheme.primary,
-                              ),
-                              if (isPlatformMobile) ...[
-                                const SizedBox(height: 20),
-                                _buildPrimaryActionCard(
-                                  context: context,
-                                  icon: Icons.camera_alt_rounded,
-                                  title: 'Capture X-Ray',
-                                  description: 'Take a new photo with camera',
-                                  onTap: () =>
-                                      _handleImageSelection(fromCamera: true),
-                                  isLoading:
-                                      _activeAction ==
-                                      HomeActionState.capturing,
-                                  color: colorScheme.secondary,
-                                ),
+                                if (isPlatformMobile) ...[
+                                  const SizedBox(height: 20),
+                                  _buildPrimaryActionCard(
+                                    context: context,
+                                    icon: Icons.camera_alt_rounded,
+                                    title: 'Capture X-Ray',
+                                    description: 'Take a new photo with camera',
+                                    onTap: () =>
+                                        _handleImageSelection(fromCamera: true),
+                                    isLoading:
+                                        _activeAction ==
+                                        HomeActionState.capturing,
+                                    color: AppColors.secondary,
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
 
-                        SizedBox(height: isMobile ? 48 : 64),
+                          const SizedBox(height: 64),
 
-                        // Refined Info footer
-                        _buildInfoFooter(theme, colorScheme),
-                      ],
+                          // Refined Info footer
+                          _buildInfoFooter(theme),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildAnimatedLogo(ColorScheme colorScheme, bool isMobile) {
+  Widget _buildAnimatedLogo(bool isMobile) {
     return Container(
       width: isMobile ? 120 : 140,
       height: isMobile ? 120 : 140,
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: AppColors.surfaceLight,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.15),
+            color: AppColors.primary.withOpacity(0.15),
             blurRadius: 40,
             spreadRadius: 2,
           ),
@@ -291,12 +348,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Container(
           width: isMobile ? 100 : 120,
           height: isMobile ? 100 : 120,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: SweepGradient(
               colors: [
-                colorScheme.primary,
-                colorScheme.secondary,
-                colorScheme.primary,
+                AppColors.primary,
+                AppColors.secondary,
+                AppColors.primary,
               ],
             ),
             shape: BoxShape.circle,
@@ -304,14 +361,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.health_and_safety_rounded,
-                size: isMobile ? 60 : 72,
-                color: colorScheme.primary,
+                size: 60,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -342,13 +399,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               : (_activeAction != HomeActionState.none && !isLoading
                     ? 0.98
                     : 1.0),
-          duration: const Duration(milliseconds: 200),
+          duration: AppConstants.fastAnimation,
           child: Container(
             width: double.infinity,
             padding: EdgeInsets.all(isMobile ? 24 : 32),
             decoration: BoxDecoration(
               color: color.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(
+                AppConstants.radiusExtraLarge,
+              ),
               border: Border.all(color: color.withOpacity(0.15), width: 2),
               boxShadow: [
                 BoxShadow(
@@ -441,12 +500,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildInfoFooter(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildInfoFooter(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(28),
+        color: theme.brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -485,11 +546,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-            color: Colors.black.withOpacity(0.7),
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
         ),
       ],
     );

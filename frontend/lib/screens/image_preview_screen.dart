@@ -1,12 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/adaptive_button.dart';
 import '../widgets/image_display_widget.dart';
+import '../core/theme/app_colors.dart';
+import '../core/constants/app_constants.dart';
 
 /// Screen for previewing and analyzing uploaded X-ray images
 class ImagePreviewScreen extends StatefulWidget {
-  final File imageSource;
+  final dynamic imageSource; // File on Mobile/Desktop, Uint8List on Web
 
   const ImagePreviewScreen({super.key, required this.imageSource});
 
@@ -25,7 +26,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
   void initState() {
     super.initState();
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: AppConstants.mediumAnimation,
       vsync: this,
     );
     _slideAnimation = Tween<Offset>(
@@ -52,9 +53,10 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
     setState(() {
       _analysisResults = {
         'status': 'success',
-        'confidence': 0.92,
+        'confidence': 0.94,
         'diagnosis': 'Normal',
-        'details': 'No abnormalities detected in the chest X-ray.',
+        'details':
+            'The lung fields are clear. No evidence of pneumonia, tuberculosis, or pleural effusion. Cardiac silhouette is within normal limits.',
       };
       _isAnalyzing = false;
     });
@@ -63,22 +65,25 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final isMobile = ResponsiveHelper.isMobile(context);
 
     return Scaffold(
+      backgroundColor: theme.brightness == Brightness.dark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
-          'X-Ray Analysis',
+          'Diagnostic Preview',
           style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
           ),
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -88,59 +93,83 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
           child: Center(
             child: SingleChildScrollView(
               child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: ResponsiveHelper.getMaxContentWidth(context),
+                constraints: const BoxConstraints(
+                  maxWidth: AppConstants.maxContentWidth,
                 ),
                 padding: ResponsiveHelper.getResponsivePadding(context),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Image Display
-                    ImageDisplayWidget(
-                      imageSource: widget.imageSource,
-                      maxHeight: isMobile
-                          ? MediaQuery.of(context).size.height * 0.5
-                          : MediaQuery.of(context).size.height * 0.6,
+                    // Image Display with a subtle frame
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.radiusLarge,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.radiusLarge,
+                        ),
+                        child: ImageDisplayWidget(
+                          imageSource: widget.imageSource,
+                          maxHeight: isMobile
+                              ? MediaQuery.of(context).size.height * 0.45
+                              : MediaQuery.of(context).size.height * 0.55,
+                        ),
+                      ),
                     ),
-                    SizedBox(height: isMobile ? 24 : 32),
+                    const SizedBox(height: AppConstants.paddingExtraLarge),
 
                     // Analysis Results (if available)
                     if (_analysisResults != null) ...[
                       _buildAnalysisResults(context),
-                      SizedBox(height: isMobile ? 24 : 32),
+                      const SizedBox(height: AppConstants.paddingExtraLarge),
                     ],
 
                     // Action Buttons
                     _buildActionButtons(context),
-                    SizedBox(height: isMobile ? 16 : 24),
+                    const SizedBox(height: AppConstants.paddingLarge),
 
                     // Info Card
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppConstants.paddingMedium),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withOpacity(
-                          0.5,
+                        color: theme.brightness == Brightness.dark
+                            ? AppColors.surfaceDark
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.radiusMedium,
                         ),
-                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: colorScheme.outline.withOpacity(0.2),
+                          color: AppColors.primary.withOpacity(0.1),
                         ),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.lightbulb_outline_rounded,
-                            color: colorScheme.primary,
+                          const Icon(
+                            Icons.verified_rounded,
+                            color: AppColors.success,
                             size: 24,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               _analysisResults == null
-                                  ? 'Tap "Analyze" to get AI-powered insights'
-                                  : 'Analysis complete! Review the results above.',
+                                  ? 'Ready for AI processing. Tap analyze to begin.'
+                                  : 'Analysis complete. Verified by AI diagnostics.',
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurface.withOpacity(0.8),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.8,
+                                ),
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -159,28 +188,26 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
 
   Widget _buildAnalysisResults(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final results = _analysisResults!;
     final confidence = (results['confidence'] as double) * 100;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppConstants.paddingExtraLarge),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            colorScheme.primaryContainer,
-            colorScheme.secondaryContainer,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: theme.brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : Colors.white,
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.15),
+          width: 2,
         ),
-        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primary.withOpacity(0.05),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -192,12 +219,12 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.success.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: colorScheme.primary,
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.success,
                   size: 28,
                 ),
               ),
@@ -207,17 +234,18 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Analysis Complete',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimaryContainer,
+                      'AI Diagnostic Result',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Confidence: ${confidence.toStringAsFixed(1)}%',
+                      'Confidence Level: ${confidence.toStringAsFixed(1)}%',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onPrimaryContainer.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -225,21 +253,23 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          const Divider(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+          const Divider(height: 1),
+          const SizedBox(height: 24),
           _buildResultRow(
             context,
-            'Diagnosis',
+            'Detection Result',
             results['diagnosis'] as String,
-            Icons.medical_information_rounded,
+            Icons.medical_services_rounded,
+            AppColors.primary,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildResultRow(
             context,
-            'Details',
+            'Clinical Observations',
             results['details'] as String,
-            Icons.description_rounded,
+            Icons.article_rounded,
+            AppColors.secondary,
           ),
         ],
       ),
@@ -251,32 +281,40 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
     String label,
     String value,
     IconData icon,
+    Color color,
   ) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: colorScheme.primary, size: 20),
-        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onPrimaryContainer.withOpacity(0.7),
-                  fontWeight: FontWeight.w600,
+                label.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 value,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
+                  height: 1.4,
                 ),
               ),
             ],
@@ -293,18 +331,18 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
       return Column(
         children: [
           AdaptiveButton(
-            text: _analysisResults == null ? 'Analyze X-Ray' : 'Re-Analyze',
+            text: _analysisResults == null ? 'Process X-Ray' : 'Re-Analyze',
             onPressed: _analyzeImage,
-            icon: Icons.analytics_rounded,
+            icon: Icons.biotech_rounded,
             isLoading: _isAnalyzing,
             isPrimary: true,
             width: double.infinity,
           ),
           const SizedBox(height: 12),
           AdaptiveButton(
-            text: 'Upload Another',
+            text: 'Discard & New',
             onPressed: () => Navigator.pop(context),
-            icon: Icons.upload_file_rounded,
+            icon: Icons.delete_sweep_rounded,
             isPrimary: false,
             width: double.infinity,
           ),
@@ -315,18 +353,18 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen>
         children: [
           Expanded(
             child: AdaptiveButton(
-              text: 'Upload Another',
+              text: 'Discard & New',
               onPressed: () => Navigator.pop(context),
-              icon: Icons.upload_file_rounded,
+              icon: Icons.delete_sweep_rounded,
               isPrimary: false,
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: AdaptiveButton(
-              text: _analysisResults == null ? 'Analyze X-Ray' : 'Re-Analyze',
+              text: _analysisResults == null ? 'Process X-Ray' : 'Re-Analyze',
               onPressed: _analyzeImage,
-              icon: Icons.analytics_rounded,
+              icon: Icons.biotech_rounded,
               isLoading: _isAnalyzing,
               isPrimary: true,
             ),

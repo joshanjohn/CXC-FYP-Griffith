@@ -45,6 +45,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to your camera to capture X-ray images for analysis.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone when capturing X-ray videos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library to select X-ray images for analysis.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

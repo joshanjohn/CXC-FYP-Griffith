@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
+import '../core/constants/app_constants.dart';
 
 /// Widget for displaying images responsively across different screen sizes
 class ImageDisplayWidget extends StatelessWidget {
@@ -32,7 +34,7 @@ class ImageDisplayWidget extends StatelessWidget {
         maxWidth: displayWidth,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -42,15 +44,24 @@ class ImageDisplayWidget extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         child: _buildImage(theme),
       ),
     );
   }
 
   Widget _buildImage(ThemeData theme) {
+    if (imageSource is Uint8List) {
+      // Memory: used for Web or whenever raw bytes are provided
+      return Image.memory(
+        imageSource,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(theme),
+      );
+    }
+
     if (kIsWeb) {
-      // Web: handle network or local file
+      // Web: handle network or local blob URLs (if passed as string)
       if (imageSource is String) {
         return Image.network(
           imageSource,
@@ -65,7 +76,7 @@ class ImageDisplayWidget extends StatelessWidget {
         );
       }
     } else {
-      // Mobile/Desktop: handle File
+      // Mobile/Desktop: handle File or path strings
       if (imageSource is File) {
         return Image.file(
           imageSource,
@@ -97,18 +108,23 @@ class ImageDisplayWidget extends StatelessWidget {
 
   Widget _buildErrorWidget(ThemeData theme) {
     return Container(
-      color: theme.colorScheme.errorContainer,
+      color: AppColors.error.withOpacity(0.1),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 16),
             Text(
               'Failed to load image',
               style: TextStyle(
-                color: theme.colorScheme.onErrorContainer,
+                color: AppColors.error,
                 fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
