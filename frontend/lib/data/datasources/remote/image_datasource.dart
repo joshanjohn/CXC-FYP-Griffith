@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 enum PermissionResult { granted, denied, permanentlyDenied }
 
 /// Service for handling image selection and camera capture
-class ImageService {
+class ImageDatasource {
   final ImagePicker _picker = ImagePicker();
   List<CameraDescription>? _cameras;
 

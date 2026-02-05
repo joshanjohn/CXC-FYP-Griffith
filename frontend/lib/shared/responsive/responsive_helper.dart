@@ -1,26 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'breakpoints.dart';
 
 /// Responsive helper class for adaptive layouts
 class ResponsiveHelper {
-  static const double mobileBreakpoint = 600;
-  static const double tabletBreakpoint = 900;
-  static const double desktopBreakpoint = 1200;
-
   /// Check if the current device is mobile
   static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < mobileBreakpoint;
+    return MediaQuery.of(context).size.width < Breakpoints.mobile;
   }
 
   /// Check if the current device is tablet
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width >= mobileBreakpoint && width < desktopBreakpoint;
+    return width >= Breakpoints.mobile && width < Breakpoints.desktop;
   }
 
   /// Check if the current device is desktop
   static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= desktopBreakpoint;
+    return MediaQuery.of(context).size.width >= Breakpoints.desktop;
   }
 
   /// Check if the platform is mobile (iOS or Android)

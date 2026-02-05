@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../core/theme/app_colors.dart';
-import '../core/constants/app_constants.dart';
+import '../../../../app/themes/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 
-class PermissionErrorScreen extends StatelessWidget {
+class PermissionErrorPage extends StatelessWidget {
   final String permissionName;
   final String description;
 
-  const PermissionErrorScreen({
+  const PermissionErrorPage({
     super.key,
     required this.permissionName,
     required this.description,

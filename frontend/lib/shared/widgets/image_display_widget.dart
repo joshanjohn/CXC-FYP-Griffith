@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../core/theme/app_colors.dart';
-import '../core/constants/app_constants.dart';
+import '../../app/themes/app_colors.dart';
+import '../../core/constants/app_constants.dart';
 
 /// Widget for displaying images responsively across different screen sizes
 class ImageDisplayWidget extends StatelessWidget {

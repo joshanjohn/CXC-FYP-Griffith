@@ -1,22 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/presentation/responsive/narrow_layout.dart';
-import 'package:frontend/features/presentation/responsive/wide_layout.dart';
+import 'routes.dart';
+import 'themes/app_colors.dart';
+import '../core/constants/app_constants.dart';
 
-class App extends StatelessWidget {
-  const App({super.key});
+class ChestXRayApp extends StatelessWidget {
+  const ChestXRayApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
-          // wide screen
-          return WideLayout();
-        } else {
-          // narrow screen
-          return NarrowLayout();
-        }
-      },
+    return MaterialApp(
+      title: AppConstants.appName,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: AppColors.backgroundLight,
+        fontFamily: 'Outfit', // Consistent with UX improvements
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: AppColors.backgroundDark,
+        fontFamily: 'Outfit',
+      ),
+      initialRoute: AppRoutes.initial,
+      routes: AppRoutes.routes,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
 }

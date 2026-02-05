@@ -28,10 +28,10 @@ class AppConstants {
   static const String logoPath = 'assets/icons/logo.png';
 
   // Strings
-  static const String homeTitle = 'Chest X-Ray Analysis';
+  static const String homeTitle = 'AI-Powered\nX-Ray Analysis';
   static const String homeSubtitle =
-      'Advanced artificial intelligence for medical diagnostic imaging';
+      'Advanced diagnostic imaging with state-of-the-art neural networks.';
   static const String permissionErrorTitle = 'Permissions Required';
   static const String permissionErrorSubtitle =
-      'This app requires camera and storage access to analyze X-ray images.';
+      'This app requires camera and storage access to provide medical analysis.';
 }

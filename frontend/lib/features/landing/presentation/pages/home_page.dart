@@ -2,27 +2,28 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/image_service.dart';
-import '../utils/responsive_helper.dart';
-import '../core/theme/app_colors.dart';
-import '../core/constants/app_constants.dart';
-import 'image_preview_screen.dart';
-import 'permission_error_screen.dart';
-import '../widgets/drag_drop_zone.dart';
+import '../../../../data/datasources/remote/image_datasource.dart';
+import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../../app/themes/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../analysis/presentation/pages/image_preview_page.dart';
+import '../../../analysis/presentation/pages/permission_error_page.dart';
+import '../../../analysis/presentation/widgets/drag_drop_zone.dart';
+import '../../../../shared/widgets/background_painter.dart';
 
 /// Enum to track the current loading state of individual actions
 enum HomeActionState { none, uploading, capturing }
 
 /// Home screen with upload and camera capture options
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final ImageService _imageService = ImageService();
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  final ImageDatasource _imageService = ImageDatasource();
   HomeActionState _activeAction = HomeActionState.none;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
@@ -79,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                ImagePreviewScreen(imageSource: source),
+                ImagePreviewPage(imageSource: source),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PermissionErrorScreen(
+              builder: (context) => PermissionErrorPage(
                 permissionName: fromCamera ? 'Camera' : 'Storage/Photos',
                 description: fromCamera
                     ? 'The app cannot capture X-rays without camera access.'
@@ -143,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              ImagePreviewScreen(imageSource: source),
+              ImagePreviewPage(imageSource: source),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -173,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: CustomPaint(
                 painter: MedicalBackgroundPainter(
                   color: AppColors.primary.withOpacity(0.04),
-                  isDarkMode: theme.brightness == Brightness.dark,
                 ),
               ),
             ),
@@ -551,47 +551,4 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ],
     );
   }
-}
-
-/// Custom painter for a medical-themed grid/dots background
-class MedicalBackgroundPainter extends CustomPainter {
-  final Color color;
-  final bool isDarkMode;
-
-  MedicalBackgroundPainter({required this.color, required this.isDarkMode});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.0;
-
-    const spacing = 50.0;
-
-    // Draw grid of small dots
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-
-    // Draw some larger decorative circles
-    final largeCirclePaint = Paint()
-      ..color = color.withOpacity(0.06)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.15),
-      180,
-      largeCirclePaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.85),
-      240,
-      largeCirclePaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
