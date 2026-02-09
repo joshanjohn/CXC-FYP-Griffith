@@ -29,7 +29,7 @@ class PermissionErrorPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withOpacity(0.1),
+                  color: AppColors.error.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -59,7 +59,7 @@ class PermissionErrorPage extends StatelessWidget {
               Text(
                 description,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.onSurfaceLight.withOpacity(0.6),
+                  color: AppColors.onSurfaceLight.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),

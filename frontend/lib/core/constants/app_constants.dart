@@ -1,6 +1,6 @@
 class AppConstants {
   // App Info
-  static const String appName = 'Chest X-Ray AI';
+  static const String appName = 'Chest X-Ray ML';
 
   // Responsive Design
   static const double mobileBreakpoint = 600.0;
@@ -28,7 +28,7 @@ class AppConstants {
   static const String logoPath = 'assets/icons/logo.png';
 
   // Strings
-  static const String homeTitle = 'AI-Powered\nX-Ray Analysis';
+  static const String homeTitle = 'ML-Powered\nX-Ray Analysis';
   static const String homeSubtitle =
       'Advanced diagnostic imaging with state-of-the-art neural networks.';
   static const String permissionErrorTitle = 'Permissions Required';

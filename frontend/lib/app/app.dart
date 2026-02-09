@@ -15,15 +15,21 @@ class ChestXRayApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          surface: AppColors.surfaceLight,
+          onSurface: AppColors.onSurfaceLight,
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: AppColors.backgroundLight,
-        fontFamily: 'Outfit', // Consistent with UX improvements
+        fontFamily: 'Outfit',
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          surface: AppColors.surfaceDark,
+          onSurface: AppColors.onSurfaceDark,
           brightness: Brightness.dark,
         ),
         scaffoldBackgroundColor: AppColors.backgroundDark,

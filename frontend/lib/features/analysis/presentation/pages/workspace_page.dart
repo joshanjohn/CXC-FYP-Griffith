@@ -6,7 +6,6 @@ import '../../../../app/themes/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/responsive/responsive_helper.dart';
 import '../widgets/workspace_card.dart';
-import '../../../../shared/widgets/background_painter.dart';
 import '../widgets/drag_drop_zone.dart';
 import '../../../../shared/widgets/adaptive_button.dart';
 import 'image_preview_page.dart';
@@ -60,6 +59,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
           source = File((result as dynamic).path);
         }
 
+        if (!mounted) return;
         Navigator.push(
           context,
           PageRouteBuilder(
@@ -112,6 +112,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final isMobile = ResponsiveHelper.isMobile(context);
+    final isDeviceMobile = !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
     return Scaffold(
       body: Stack(
@@ -124,226 +125,63 @@ class _WorkspacePageState extends State<WorkspacePage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isDark
-                      ? [const Color(0xFF030712), const Color(0xFF0F172A)]
-                      : [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
+                      ? [AppColors.backgroundDark, AppColors.surfaceDark]
+                      : AppColors.backgroundGradient,
                 ),
               ),
             ),
           ),
 
-          // Decorative Shapes Painter
-          Positioned.fill(
-            child: CustomPaint(
-              painter: MedicalBackgroundPainter(
-                color: isDark
-                    ? AppColors.primary.withOpacity(0.05)
-                    : AppColors.primary.withOpacity(0.03),
-              ),
-            ),
-          ),
-
           SafeArea(
-            child: SingleChildScrollView(
-              child: Center(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: ResponsiveHelper.getResponsivePadding(context),
                 child: Container(
                   constraints: const BoxConstraints(
                     maxWidth: AppConstants.maxContentWidth,
                   ),
-                  padding: ResponsiveHelper.getResponsivePadding(context),
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
-                      // Feature Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.primary.withOpacity(0.2),
-                          ),
-                        ),
-                        child: Text(
-                          'AI POWERED',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Hero Title
-                      Text(
-                        AppConstants.homeTitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          fontSize: ResponsiveHelper.getResponsiveFontSize(
-                            context,
-                            48,
-                          ),
-                          letterSpacing: -1.5,
-                          height: 1.1,
-                          color: isDark
-                              ? Colors.white
-                              : AppColors.onSurfaceLight,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Subtitle
-                      Text(
-                        AppConstants.homeSubtitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          fontSize: ResponsiveHelper.getResponsiveFontSize(
-                            context,
-                            18,
-                          ),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 60),
-
-                      // Responsive Content Layout
-                      Builder(
-                        builder: (context) {
-                          if (isMobile) {
-                            return Column(
-                              children: [
-                                _buildMobileCard(
-                                  context,
-                                  'Upload X-Ray',
-                                  'Select scan from gallery',
-                                  Icons.upload_file_rounded,
-                                  AppColors.clientPrimary,
-                                  () =>
-                                      _handleImageSelection(fromCamera: false),
-                                ),
-                                const SizedBox(height: 20),
-                                _buildMobileCard(
-                                  context,
-                                  'Take Photo',
-                                  'Capture a live X-Ray scan',
-                                  Icons.camera_enhance_rounded,
-                                  AppColors.studioPrimary,
-                                  () => _handleImageSelection(fromCamera: true),
-                                ),
-                                const SizedBox(height: 20),
-                                _buildMobileCard(
-                                  context,
-                                  'View Reports',
-                                  'Access diagnostic history',
-                                  Icons.folder_shared_rounded,
-                                  AppColors.coachPrimary,
-                                  () {},
-                                ),
-                              ],
-                            );
-                          } else {
-                            // Wide Screen Centralized Design
-                            return DragDropZone(
-                              onFilesDropped: (files) {
-                                if (files.isNotEmpty) {
-                                  _handleImageSelection(
-                                    fromCamera: false,
-                                    dropFile: files.first,
-                                  );
-                                }
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 60,
-                                  horizontal: 40,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? Colors.white.withOpacity(0.03)
-                                      : Colors.white.withOpacity(0.4),
-                                  borderRadius: BorderRadius.circular(
-                                    AppConstants.radiusExtraLarge,
+                      if (isMobile) ...[
+                        _buildHeroSection(context, theme, isDark),
+                        const SizedBox(height: 48),
+                        _buildMobileUpload(context, isDeviceMobile),
+                      ] else ...[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Left Side: Titles & Subtitles
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildFeatureBadge(theme),
+                                  const SizedBox(height: 24),
+                                  _buildHeroText(
+                                    context,
+                                    theme,
+                                    isDark,
+                                    textAlign: TextAlign.left,
                                   ),
-                                  border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.15),
-                                    width: 1.5,
+                                  const SizedBox(height: 24),
+                                  _buildSubtitleText(
+                                    context,
+                                    theme,
+                                    textAlign: TextAlign.left,
                                   ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(24),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(
-                                          0.1,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.cloud_upload_outlined,
-                                        size: 72,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 32),
-                                    Text(
-                                      'Drag & Drop X-Ray Scans',
-                                      style: theme.textTheme.headlineSmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w900,
-                                            letterSpacing: -0.5,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'Support for JPG, PNG, and Medical DICOM formats',
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withOpacity(0.6),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 48),
-                                    AdaptiveButton(
-                                      text: 'Select Scans to Upload',
-                                      onPressed: () => _handleImageSelection(
-                                        fromCamera: false,
-                                      ),
-                                      icon: Icons.add_rounded,
-                                      width: 320,
-                                    ),
-                                    const SizedBox(height: 32),
-                                    TextButton.icon(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.history_rounded),
-                                      label: const Text(
-                                        'View Analysis History',
-                                      ),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: theme
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.5),
-                                        textStyle: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            );
-                          }
-                        },
-                      ),
-
+                            ),
+                            const SizedBox(width: 80),
+                            // Right Side: Upload Zone
+                            Expanded(
+                              flex: 1,
+                              child: _buildUploadZone(context, theme, isDark),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -363,14 +201,181 @@ class _WorkspacePageState extends State<WorkspacePage> {
     );
   }
 
-  Widget _buildMobileCard(
+  Widget _buildFeatureBadge(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        'ML POWERED',
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroText(
     BuildContext context,
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
+    ThemeData theme,
+    bool isDark, {
+    TextAlign textAlign = TextAlign.center,
+  }) {
+    return Text(
+      AppConstants.homeTitle,
+      textAlign: textAlign,
+      style: theme.textTheme.headlineLarge?.copyWith(
+        fontWeight: FontWeight.w900,
+        fontSize: ResponsiveHelper.getResponsiveFontSize(context, 48),
+        letterSpacing: -1.5,
+        height: 1.1,
+        color: isDark ? Colors.white : AppColors.onSurfaceLight,
+      ),
+    );
+  }
+
+  Widget _buildSubtitleText(
+    BuildContext context,
+    ThemeData theme, {
+    TextAlign textAlign = TextAlign.center,
+  }) {
+    return Text(
+      AppConstants.homeSubtitle,
+      textAlign: textAlign,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        fontSize: ResponsiveHelper.getResponsiveFontSize(context, 18),
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _buildHeroSection(BuildContext context, ThemeData theme, bool isDark) {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        _buildFeatureBadge(theme),
+        const SizedBox(height: 24),
+        _buildHeroText(context, theme, isDark),
+        const SizedBox(height: 16),
+        _buildSubtitleText(context, theme),
+      ],
+    );
+  }
+
+  Widget _buildMobileUpload(BuildContext context, bool isDeviceMobile) {
+    return Column(
+      children: [
+        _buildMobileCard(
+          context: context,
+          title: 'Upload X-Ray',
+          subtitle: 'Select scan from gallery',
+          icon: Icons.upload_file_rounded,
+          color: AppColors.primary,
+          onTap: () => _handleImageSelection(fromCamera: false),
+        ),
+        if (isDeviceMobile) ...[
+          const SizedBox(height: 20),
+          _buildMobileCard(
+            context: context,
+            title: 'Take Photo',
+            subtitle: 'Capture a live X-Ray scan',
+            icon: Icons.camera_enhance_rounded,
+            color: AppColors.primaryDark,
+            onTap: () => _handleImageSelection(fromCamera: true),
+          ),
+        ],
+        const SizedBox(height: 20),
+        _buildMobileCard(
+          context: context,
+          title: 'View Reports',
+          subtitle: 'Access diagnostic history',
+          icon: Icons.folder_shared_rounded,
+          color: AppColors.accent,
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUploadZone(BuildContext context, ThemeData theme, bool isDark) {
+    return DragDropZone(
+      onFilesDropped: (files) {
+        if (files.isNotEmpty) {
+          _handleImageSelection(fromCamera: false, dropFile: files.first);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 40),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.03)
+              : Colors.white.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(AppConstants.radiusExtraLarge),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.cloud_upload_outlined,
+                size: 72,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Text(
+              'Drag & Drop X-Ray Scans',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Support for JPG, PNG, and Medical DICOM formats',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 48),
+            AdaptiveButton(
+              text: 'Browse Files',
+              onPressed: () => _handleImageSelection(fromCamera: false),
+              icon: Icons.add_rounded,
+              width: 240,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return WorkspaceCard(
       title: title,
       subtitle: subtitle,

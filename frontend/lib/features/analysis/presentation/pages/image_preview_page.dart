@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../shared/responsive/responsive_helper.dart';
 import '../../../../shared/widgets/adaptive_button.dart';
 import '../../../../shared/widgets/image_display_widget.dart';
-import '../../../../shared/widgets/background_painter.dart';
 import '../../../../app/themes/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 
@@ -80,20 +79,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isDark
-                      ? [const Color(0xFF030712), const Color(0xFF0F172A)]
-                      : [const Color(0xFFF8FAFC), const Color(0xFFF1F5F9)],
+                      ? [AppColors.backgroundDark, AppColors.surfaceDark]
+                      : AppColors.backgroundGradient,
                 ),
-              ),
-            ),
-          ),
-
-          // Decorative Shapes Painter
-          Positioned.fill(
-            child: CustomPaint(
-              painter: MedicalBackgroundPainter(
-                color: isDark
-                    ? AppColors.primary.withOpacity(0.05)
-                    : AppColors.primary.withOpacity(0.03),
               ),
             ),
           ),
@@ -127,113 +115,63 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                     position: _slideAnimation,
                     child: Center(
                       child: SingleChildScrollView(
+                        padding: ResponsiveHelper.getResponsivePadding(context),
                         child: Container(
                           constraints: const BoxConstraints(
                             maxWidth: AppConstants.maxContentWidth,
                           ),
-                          padding: ResponsiveHelper.getResponsivePadding(
-                            context,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Image Display with a premium feel
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    AppConstants.radiusLarge,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 40,
-                                      offset: const Offset(0, 20),
+                          child: isMobile
+                              ? Column(
+                                  children: [
+                                    _buildImageCard(context, isDark, isMobile),
+                                    const SizedBox(height: 32),
+                                    if (_analysisResults != null) ...[
+                                      _buildAnalysisResults(context),
+                                      const SizedBox(height: 32),
+                                    ],
+                                    _buildActionButtons(context),
+                                    const SizedBox(height: 24),
+                                    _buildModernStatusCard(
+                                      context,
+                                      theme,
+                                      isDark,
                                     ),
                                   ],
-                                  border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.2),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    AppConstants.radiusLarge - 2,
-                                  ),
-                                  child: ImageDisplayWidget(
-                                    imageSource: widget.imageSource,
-                                    maxWidth: 800,
-                                    maxHeight: isMobile
-                                        ? MediaQuery.of(context).size.height *
-                                              0.45
-                                        : MediaQuery.of(context).size.height *
-                                              0.55,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: AppConstants.paddingExtraLarge,
-                              ),
-
-                              // Analysis Results (if available)
-                              if (_analysisResults != null) ...[
-                                _buildAnalysisResults(context),
-                                const SizedBox(
-                                  height: AppConstants.paddingExtraLarge,
-                                ),
-                              ],
-
-                              // Action Buttons
-                              _buildActionButtons(context),
-                              const SizedBox(height: AppConstants.paddingLarge),
-
-                              // Info Card
-                              Container(
-                                padding: const EdgeInsets.all(
-                                  AppConstants.paddingMedium,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.surfaceDark.withOpacity(0.5)
-                                      : Colors.white.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(
-                                    AppConstants.radiusMedium,
-                                  ),
-                                  border: Border.all(
-                                    color: AppColors.primary.withOpacity(0.1),
-                                  ),
-                                ),
-                                child: Row(
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      _isAnalyzing
-                                          ? Icons.hourglass_empty_rounded
-                                          : Icons.verified_rounded,
-                                      color: _isAnalyzing
-                                          ? AppColors.warning
-                                          : AppColors.success,
-                                      size: 24,
-                                    ),
-                                    const SizedBox(width: 12),
+                                    // Left: Image
                                     Expanded(
-                                      child: Text(
-                                        _isAnalyzing
-                                            ? 'AI is scanning the X-Ray...'
-                                            : (_analysisResults == null
-                                                  ? 'Ready for AI processing. Tap analyze to begin.'
-                                                  : 'Analysis complete. Verified by AI diagnostics.'),
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.8),
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                      flex: 3,
+                                      child: _buildImageCard(
+                                        context,
+                                        isDark,
+                                        isMobile,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 48),
+                                    // Right: Results & Actions
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        children: [
+                                          if (_analysisResults != null) ...[
+                                            _buildAnalysisResults(context),
+                                            const SizedBox(height: 32),
+                                          ],
+                                          _buildActionButtons(context),
+                                          const SizedBox(height: 24),
+                                          _buildModernStatusCard(
+                                            context,
+                                            theme,
+                                            isDark,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
                       ),
                     ),
@@ -242,48 +180,120 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
               ],
             ),
           ),
-          if (_isAnalyzing)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.6)),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
-                        ),
-                        strokeWidth: 3,
-                      ),
-                      const SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Text(
-                          'AI DIAGNOSTIC SCAN IN PROGRESS',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                      ),
-                    ],
+          if (_isAnalyzing) _buildAnalyzingOverlay(context, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageCard(BuildContext context, bool isDark, bool isMobile) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 40,
+            offset: const Offset(0, 20),
+          ),
+        ],
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.2),
+          width: 2,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge - 2),
+        child: ImageDisplayWidget(
+          imageSource: widget.imageSource,
+          maxWidth: 800,
+          maxHeight: isMobile
+              ? MediaQuery.of(context).size.height * 0.45
+              : MediaQuery.of(context).size.height * 0.6,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernStatusCard(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.paddingMedium),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.surfaceDark.withValues(alpha: 0.5)
+            : Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            _isAnalyzing
+                ? Icons.hourglass_empty_rounded
+                : Icons.verified_rounded,
+            color: _isAnalyzing ? AppColors.warning : AppColors.success,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              _isAnalyzing
+                  ? 'AI is scanning the X-Ray...'
+                  : (_analysisResults == null
+                        ? 'Ready for AI processing. Tap analyze to begin.'
+                        : 'Analysis complete. Verified by AI diagnostics.'),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalyzingOverlay(BuildContext context, ThemeData theme) {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.6)),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                strokeWidth: 3,
+              ),
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  'AI DIAGNOSTIC SCAN IN PROGRESS',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2.0,
                   ),
                 ),
               ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -302,12 +312,12 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             : Colors.white,
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.15),
+          color: AppColors.primary.withValues(alpha: 0.15),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.05),
+            color: AppColors.primary.withValues(alpha: 0.05),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -321,7 +331,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -346,7 +356,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                     Text(
                       'Confidence Level: ${confidence.toStringAsFixed(1)}%',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -371,7 +383,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             'Clinical Observations',
             results['details'] as String,
             Icons.article_rounded,
-            AppColors.secondary,
+            AppColors.accent,
           ),
         ],
       ),
@@ -393,7 +405,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 18),

@@ -86,14 +86,14 @@ class _AdaptiveButtonState extends State<AdaptiveButton>
               border: widget.isPrimary
                   ? null
                   : Border.all(
-                      color: AppColors.outlineLight.withOpacity(0.3),
+                      color: AppColors.outlineLight.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
               boxShadow: [
                 BoxShadow(
                   color: widget.isPrimary
-                      ? AppColors.primary.withOpacity(_isHovered ? 0.4 : 0.2)
-                      : Colors.black.withOpacity(_isHovered ? 0.1 : 0.05),
+                      ? AppColors.primary.withValues(alpha: _isHovered ? 0.4 : 0.2)
+                      : Colors.black.withValues(alpha: _isHovered ? 0.1 : 0.05),
                   blurRadius: _isHovered ? 20 : 12,
                   offset: Offset(0, _isHovered ? 8 : 4),
                 ),

@@ -44,17 +44,17 @@ class _WorkspaceCardState extends State<WorkspaceCard>
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
             color: isDark
-                ? widget.themeColor.withOpacity(_isHovered ? 0.08 : 0.04)
-                : widget.themeColor.withOpacity(_isHovered ? 0.04 : 0.02),
+                ? widget.themeColor.withValues(alpha: _isHovered ? 0.08 : 0.04)
+                : widget.themeColor.withValues(alpha: _isHovered ? 0.04 : 0.02),
             borderRadius: BorderRadius.circular(AppConstants.radiusExtraLarge),
             border: Border.all(
-              color: widget.themeColor.withOpacity(_isHovered ? 0.6 : 0.3),
+              color: widget.themeColor.withValues(alpha: _isHovered ? 0.6 : 0.3),
               width: 1.5,
             ),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: widget.themeColor.withOpacity(0.15),
+                  color: widget.themeColor.withValues(alpha: 0.15),
                   blurRadius: 40,
                   spreadRadius: 2,
                 ),
@@ -67,7 +67,7 @@ class _WorkspaceCardState extends State<WorkspaceCard>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: widget.themeColor.withOpacity(0.15),
+                  color: widget.themeColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(widget.icon, color: widget.themeColor, size: 28),
@@ -87,7 +87,7 @@ class _WorkspaceCardState extends State<WorkspaceCard>
               Text(
                 widget.subtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   height: 1.5,
                   fontWeight: FontWeight.w500,
                 ),
@@ -110,7 +110,7 @@ class _WorkspaceCardState extends State<WorkspaceCard>
                           feature,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.onSurface.withOpacity(0.8),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
                       ),
@@ -124,9 +124,9 @@ class _WorkspaceCardState extends State<WorkspaceCard>
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: widget.themeColor.withOpacity(0.2),
+                  color: widget.themeColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: widget.themeColor.withOpacity(0.3)),
+                  border: Border.all(color: widget.themeColor.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

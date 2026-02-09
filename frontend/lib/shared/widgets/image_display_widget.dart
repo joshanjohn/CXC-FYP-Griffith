@@ -37,7 +37,7 @@ class ImageDisplayWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -108,7 +108,7 @@ class ImageDisplayWidget extends StatelessWidget {
 
   Widget _buildErrorWidget(ThemeData theme) {
     return Container(
-      color: AppColors.error.withOpacity(0.1),
+      color: AppColors.error.withValues(alpha: 0.1),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
