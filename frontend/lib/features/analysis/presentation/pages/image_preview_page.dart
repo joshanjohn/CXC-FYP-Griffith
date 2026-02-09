@@ -4,6 +4,7 @@ import '../../../../shared/widgets/adaptive_button.dart';
 import '../../../../shared/widgets/image_display_widget.dart';
 import '../../../../app/themes/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../widgets/diagnostic_scanner.dart';
 
 /// Screen for previewing and analyzing uploaded X-ray images
 class ImagePreviewPage extends StatefulWidget {
@@ -47,7 +48,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
 
     // TODO: Integrate with your backend API
     // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     // Mock results for demonstration
     setState(() {
@@ -125,11 +126,15 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                                   children: [
                                     _buildImageCard(context, isDark, isMobile),
                                     const SizedBox(height: 32),
-                                    if (_analysisResults != null) ...[
+                                    if (_isAnalyzing) ...[
+                                      const DiagnosticScanner(),
+                                      const SizedBox(height: 32),
+                                    ] else if (_analysisResults != null) ...[
                                       _buildAnalysisResults(context),
                                       const SizedBox(height: 32),
                                     ],
-                                    _buildActionButtons(context),
+                                    if (!_isAnalyzing)
+                                      _buildActionButtons(context),
                                     const SizedBox(height: 24),
                                     _buildModernStatusCard(
                                       context,
@@ -156,11 +161,16 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                                       flex: 2,
                                       child: Column(
                                         children: [
-                                          if (_analysisResults != null) ...[
+                                          if (_isAnalyzing) ...[
+                                            const DiagnosticScanner(),
+                                            const SizedBox(height: 32),
+                                          ] else if (_analysisResults !=
+                                              null) ...[
                                             _buildAnalysisResults(context),
                                             const SizedBox(height: 32),
                                           ],
-                                          _buildActionButtons(context),
+                                          if (!_isAnalyzing)
+                                            _buildActionButtons(context),
                                           const SizedBox(height: 24),
                                           _buildModernStatusCard(
                                             context,
@@ -180,7 +190,6 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
               ],
             ),
           ),
-          if (_isAnalyzing) _buildAnalyzingOverlay(context, theme),
         ],
       ),
     );
@@ -253,47 +262,6 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAnalyzingOverlay(BuildContext context, ThemeData theme) {
-    return Positioned.fill(
-      child: Container(
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.6)),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                strokeWidth: 3,
-              ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Text(
-                  'AI DIAGNOSTIC SCAN IN PROGRESS',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2.0,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
