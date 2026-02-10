@@ -1,7 +1,13 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend repo for FYP"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.2",
+    "polars>=1.38.1",
+    "seaborn>=0.13.2",
+    "tensorflow>=2.20.0",
+]
