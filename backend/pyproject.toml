@@ -6,13 +6,17 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "ipykernel",
+    "keras-tuner>=1.4.8",
     "matplotlib",
     "numpy",
+    "pillow>=12.1.0",
     "polars",
     "python-dotenv",
     "scikit-learn",
     "seaborn",
+    "streamlit>=1.54.0",
     "tabulate",
     "tensorflow==2.16.1",
     "tensorflow-metal==1.1.0",
+    "watchdog>=6.0.0",
 ]
