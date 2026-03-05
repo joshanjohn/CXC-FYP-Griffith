@@ -40,3 +40,4 @@ htmlcov/
 # OS generated files
 .DS_Store
 Thumbs.db
+/notebook/CXV1/my_tuning_dir
