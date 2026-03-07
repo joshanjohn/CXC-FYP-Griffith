@@ -248,8 +248,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
               _isAnalyzing
                   ? 'AI is scanning the X-Ray...'
                   : (_analysisResults == null
-                        ? 'Ready for AI processing. Tap analyze to begin.'
-                        : 'Analysis complete. Verified by AI diagnostics.'),
+                        ? 'Ready for processing. Tap analyze to begin.'
+                        : 'Analysis complete.'),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w600,

@@ -4,7 +4,7 @@ import '../features/prediction/pages/image_preview_page.dart';
 import '../features/prediction/pages/permission_error_page.dart';
 import '../features/auth/pages/login_page.dart';
 import '../features/auth/pages/signup_page.dart';
-import '../features/profile/pages/profile_page.dart';
+
 import '../shared/widgets/navigation_shell.dart';
 
 class AppRoutes {
@@ -15,14 +15,12 @@ class AppRoutes {
   static const String error = '/error';
   static const String login = '/login';
   static const String signup = '/signup';
-  static const String profile = '/profile';
 
   static Map<String, WidgetBuilder> get routes => {
     shell: (context) => const MainShell(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),
     workspace: (context) => const WorkspacePage(),
-    profile: (context) => const ProfilePage(),
     error: (context) =>
         const PermissionErrorPage(permissionName: '', description: ''),
   };
