@@ -72,10 +72,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       setState(() {
         _analysisResults = {
           'status': 'success',
-          'confidence': results['confidence'],
-          'diagnosis': results['prediction'],
-          'details':
-              'Raw predictions: ${results['raw_predictions'].join(', ')}',
+          'confidence': (results['confidence'] as num).toDouble(),
+          'diagnosis': results['prediction'] as String,
         };
       });
     } catch (e) {
@@ -140,7 +138,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                                 _buildImageCard(context, isDark, isMobile),
                                 const SizedBox(height: 32),
                                 if (_isAnalyzing) ...[
-                                  const LinearProgressIndicator(),
+                                  const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
                                   const SizedBox(height: 32),
                                 ] else if (_analysisResults != null) ...[
                                   _buildAnalysisResults(context),
@@ -330,105 +330,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             Icons.medical_services_rounded,
             AppColors.primary,
           ),
-          const SizedBox(height: 20),
-          _buildResultRow(
-            context,
-            'Clinical Observations',
-            results['details'] as String,
-            Icons.article_rounded,
-            AppColors.accent,
-          ),
-          const SizedBox(height: 24),
-          _buildConfidenceGraph(
-            context,
-            results['raw_predictions'] as List<double>? ?? [0.0, 0.0, 0.0],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildConfidenceGraph(BuildContext context, List<double> confidences) {
-    final theme = Theme.of(context);
-    final classes = ['Normal', 'Pneumonia', 'Tuberculosis'];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Confidence Distribution',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...List.generate(3, (index) {
-          final double confVal = index < confidences.length
-              ? confidences[index]
-              : 0.0;
-          final double percentage = confVal * 100;
-          final color = index == 0
-              ? AppColors.success
-              : index == 1
-              ? AppColors.warning
-              : AppColors.error;
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      classes[index],
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.8,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${percentage.toStringAsFixed(1)}%',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Stack(
-                  children: [
-                    Container(
-                      height: 8,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: confVal.clamp(0.0, 1.0),
-                      child: Container(
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }),
-      ],
     );
   }
 
