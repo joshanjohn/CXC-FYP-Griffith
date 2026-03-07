@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../../app/themes/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../app/themes/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 
 class PermissionErrorPage extends StatelessWidget {
   final String permissionName;

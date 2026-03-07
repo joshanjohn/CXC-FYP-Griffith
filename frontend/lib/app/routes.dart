@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/testing/test_page.dart';
-import '../features/analysis/presentation/pages/workspace_page.dart';
-import '../features/analysis/presentation/pages/image_preview_page.dart';
-import '../features/analysis/presentation/pages/permission_error_page.dart';
-import '../features/auth/presentation/pages/login_page.dart';
-import '../features/auth/presentation/pages/signup_page.dart';
-import '../features/profile/presentation/pages/profile_page.dart';
+import '../features/prediction/pages/workspace_page.dart';
+import '../features/prediction/pages/image_preview_page.dart';
+import '../features/prediction/pages/permission_error_page.dart';
+import '../features/auth/pages/login_page.dart';
+import '../features/auth/pages/signup_page.dart';
+import '../features/profile/pages/profile_page.dart';
 import '../shared/widgets/navigation_shell.dart';
 
 class AppRoutes {
   static const String initial = '/login';
-  static const String test = '/test';
   static const String shell = '/';
   static const String workspace = '/workspace';
   static const String preview = '/preview';
@@ -20,7 +18,6 @@ class AppRoutes {
   static const String profile = '/profile';
 
   static Map<String, WidgetBuilder> get routes => {
-    test: (context) => const TestPage(), 
     shell: (context) => const MainShell(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),

@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../../data/datasources/remote/image_datasource.dart';
-import '../../../../app/themes/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../data/datasources/image_datasource.dart';
+import '../../../app/themes/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../shared/responsive/responsive_helper.dart';
 import '../widgets/workspace_card.dart';
 import '../widgets/drag_drop_zone.dart';
-import '../../../../shared/widgets/adaptive_button.dart';
+import '../../../shared/widgets/adaptive_button.dart';
 import 'image_preview_page.dart';
 import 'permission_error_page.dart';
 
@@ -55,7 +55,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
         } else if (result is File) {
           source = result;
         } else {
-          // Desktop drop file
+          // path conversion varies a bit by platform
           source = File((result as dynamic).path);
         }
 
@@ -117,21 +117,6 @@ class _WorkspacePageState extends State<WorkspacePage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Gradient
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [AppColors.backgroundDark, AppColors.surfaceDark]
-                      : AppColors.backgroundGradient,
-                ),
-              ),
-            ),
-          ),
-
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -150,7 +135,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Left Side: Titles & Subtitles
+                            // title and subtitle on the left
                             Expanded(
                               flex: 1,
                               child: Column(
@@ -174,7 +159,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                               ),
                             ),
                             const SizedBox(width: 80),
-                            // Right Side: Upload Zone
+                            // drop zone on the right
                             Expanded(
                               flex: 1,
                               child: _buildUploadZone(context, theme, isDark),
@@ -190,11 +175,9 @@ class _WorkspacePageState extends State<WorkspacePage> {
             ),
           ),
           if (_isProcessing)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black26,
-                child: const Center(child: CircularProgressIndicator()),
-              ),
+            Container(
+              color: Colors.black26,
+              child: const Center(child: CircularProgressIndicator()),
             ),
         ],
       ),
@@ -205,14 +188,13 @@ class _WorkspacePageState extends State<WorkspacePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         'ML POWERED',
         style: theme.textTheme.labelMedium?.copyWith(
-          color: AppColors.primary,
+          color: Colors.white,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.2,
         ),
@@ -290,15 +272,6 @@ class _WorkspacePageState extends State<WorkspacePage> {
             onTap: () => _handleImageSelection(fromCamera: true),
           ),
         ],
-        const SizedBox(height: 20),
-        _buildMobileCard(
-          context: context,
-          title: 'View Reports',
-          subtitle: 'Access diagnostic history',
-          icon: Icons.folder_shared_rounded,
-          color: AppColors.accent,
-          onTap: () {},
-        ),
       ],
     );
   }
@@ -314,14 +287,9 @@ class _WorkspacePageState extends State<WorkspacePage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 40),
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.03)
-              : Colors.white.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(AppConstants.radiusExtraLarge),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.15),
-            width: 1.5,
-          ),
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.outlineLight, width: 1),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
