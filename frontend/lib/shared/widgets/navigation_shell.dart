@@ -43,7 +43,7 @@ class MainShell extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Text(
-                'CHEST X-RAY ML',
+                'CXC (Chest X-ray Classifier)',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 2,
