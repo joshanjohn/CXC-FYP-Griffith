@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'CHEST X-RAY ML',
+                    'CXC (Chest X-ray Classifier)',
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                       letterSpacing: 4,

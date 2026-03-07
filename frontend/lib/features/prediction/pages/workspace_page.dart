@@ -155,6 +155,12 @@ class _WorkspacePageState extends State<WorkspacePage> {
                                     theme,
                                     textAlign: TextAlign.left,
                                   ),
+                                  const SizedBox(height: 8),
+                                  _buildWarningText(
+                                    context,
+                                    theme,
+                                    textAlign: TextAlign.left,
+                                  ),
                                 ],
                               ),
                             ),
@@ -188,11 +194,11 @@ class _WorkspacePageState extends State<WorkspacePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: const Color.fromARGB(255, 167, 35, 1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        'ML POWERED',
+        'CXC1',
         style: theme.textTheme.labelMedium?.copyWith(
           color: Colors.white,
           fontWeight: FontWeight.w800,
@@ -237,6 +243,22 @@ class _WorkspacePageState extends State<WorkspacePage> {
     );
   }
 
+  Widget _buildWarningText(
+    BuildContext context,
+    ThemeData theme, {
+    TextAlign textAlign = TextAlign.center,
+  }) {
+    return Text(
+      AppConstants.homeWarning,
+      textAlign: textAlign,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+        fontSize: ResponsiveHelper.getResponsiveFontSize(context, 11),
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
   Widget _buildHeroSection(BuildContext context, ThemeData theme, bool isDark) {
     return Column(
       children: [
@@ -246,6 +268,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
         _buildHeroText(context, theme, isDark),
         const SizedBox(height: 16),
         _buildSubtitleText(context, theme),
+        _buildWarningText(context, theme),
       ],
     );
   }

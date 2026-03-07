@@ -30,7 +30,8 @@ class AppConstants {
   // Strings
   static const String homeTitle = 'ML-Powered\nX-Ray Analysis';
   static const String homeSubtitle =
-      'Advanced diagnostic imaging with state-of-the-art neural networks.';
+      'Education prupose ML tool for classifying chest xrays into normal, pneumonia, or tuberculosis.';
+  static const String homeWarning = 'Note: predictions doesn\'t determine real world outcome';
   static const String permissionErrorTitle = 'Permissions Required';
   static const String permissionErrorSubtitle =
       'This app requires camera and storage access to provide medical analysis.';
