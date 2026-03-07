@@ -172,7 +172,7 @@ class ImageDatasource {
   bool isValidImageFile(String? path) {
     if (path == null) return false;
 
-    final validExtensions = ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'];
+    final validExtensions = ['.jpg', '.jpeg', '.png'];
     return validExtensions.any((ext) => path.toLowerCase().endsWith(ext));
   }
 }

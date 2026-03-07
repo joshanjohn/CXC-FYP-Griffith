@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../app/themes/app_colors.dart';
 import '../../shared/responsive/responsive_helper.dart';
-import '../../features/analysis/presentation/pages/workspace_page.dart';
-import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/prediction/pages/workspace_page.dart';
+import '../../features/profile/pages/profile_page.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});

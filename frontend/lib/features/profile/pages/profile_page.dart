@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../app/themes/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../app/themes/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../shared/responsive/responsive_helper.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

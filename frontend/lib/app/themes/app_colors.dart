@@ -22,9 +22,9 @@ class AppColors {
   static const Color onSurfaceDark = Color(0xFFF8FAFC);
   static const Color outlineDark = Color(0xFF334155);
 
-  // Transparent Shades
-  static Color glassWhite = Colors.white.withValues(alpha: 0.1);
-  static Color glassOutline = Colors.white.withValues(alpha: 0.2);
+  // Solid Simple Shades
+  static const Color glassWhite = Colors.white;
+  static const Color glassOutline = Color(0xFFF1F5F9);
 
   // Semantic Colors
   static const Color error = Color(0xFFEF4444);
@@ -32,13 +32,13 @@ class AppColors {
   static const Color warning = Color(0xFFF59E0B);
   static const Color info = Color(0xFF00B4D8);
 
-  // Gradient definitions (Clean Teal Gradient)
+  // Solid Colors
   static const List<Color> primaryGradient = [
     Color(0xFF00B4D8),
-    Color(0xFF48CAE4),
+    Color(0xFF00B4D8),
   ];
   static const List<Color> backgroundGradient = [
-    Color(0xFFF0F9FF),
+    Color(0xFFFFFFFF),
     Color(0xFFFFFFFF),
   ];
 }
