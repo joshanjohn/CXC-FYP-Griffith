@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../features/prediction/pages/workspace_page.dart';
+import '../features/prediction/pages/dashboad_page.dart';
 import '../features/prediction/pages/image_preview_page.dart';
 import '../features/prediction/pages/permission_error_page.dart';
 import '../features/auth/pages/login_page.dart';
@@ -20,7 +20,7 @@ class AppRoutes {
     shell: (context) => const MainShell(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),
-    workspace: (context) => const WorkspacePage(),
+    workspace: (context) => const DashboardPage(),
     error: (context) =>
         const PermissionErrorPage(permissionName: '', description: ''),
   };

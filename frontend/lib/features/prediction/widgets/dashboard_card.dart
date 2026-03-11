@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 
-class WorkspaceCard extends StatefulWidget {
+class DashboardCard extends StatefulWidget {
   final String title;
   final String subtitle;
   final List<String> features;
@@ -9,7 +9,7 @@ class WorkspaceCard extends StatefulWidget {
   final Color themeColor;
   final VoidCallback onTap;
 
-  const WorkspaceCard({
+  const DashboardCard({
     super.key,
     required this.title,
     required this.subtitle,
@@ -20,10 +20,10 @@ class WorkspaceCard extends StatefulWidget {
   });
 
   @override
-  State<WorkspaceCard> createState() => _WorkspaceCardState();
+  State<DashboardCard> createState() => _DashboardCardState();
 }
 
-class _WorkspaceCardState extends State<WorkspaceCard>
+class _DashboardCardState extends State<DashboardCard>
     with SingleTickerProviderStateMixin {
   bool _isHovered = false;
 
@@ -132,7 +132,7 @@ class _WorkspaceCardState extends State<WorkspaceCard>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Open Workspace',
+                      'upload',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,

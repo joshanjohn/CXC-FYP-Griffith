@@ -17,7 +17,8 @@ class _ImageUploaderState extends State<ImageUploader> {
 
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png'],
       withData: true,
     );
 
@@ -76,4 +77,3 @@ class _ImageUploaderState extends State<ImageUploader> {
     );
   }
 }
-
