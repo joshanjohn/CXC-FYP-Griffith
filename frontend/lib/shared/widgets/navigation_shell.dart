@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/themes/app_colors.dart';
 import '../../shared/responsive/responsive_helper.dart';
-import '../../features/prediction/pages/workspace_page.dart';
+import '../../features/prediction/pages/dashboad_page.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
@@ -15,7 +15,7 @@ class MainShell extends StatelessWidget {
       body: Column(
         children: [
           if (!isMobile) _buildDesktopHeader(context, theme),
-          const Expanded(child: WorkspacePage()),
+          const Expanded(child: DashboardPage()),
         ],
       ),
     );

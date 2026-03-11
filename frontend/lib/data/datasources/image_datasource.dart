@@ -77,6 +77,9 @@ class ImageDatasource {
   }
 
   /// Pick image from gallery (works on all platforms)
+  /// Allowed extensions for all platforms
+  static const _allowedExtensions = ['jpg', 'jpeg', 'png'];
+
   Future<XFile?> pickImageFromGallery() async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -85,6 +88,12 @@ class ImageDatasource {
         maxHeight: 1920,
         imageQuality: 85,
       );
+      if (image == null) return null;
+      final ext = image.path.split('.').last.toLowerCase();
+      if (!_allowedExtensions.contains(ext)) {
+        debugPrint('Unsupported format: $ext. Only JPG and PNG are allowed.');
+        return null;
+      }
       return image;
     } catch (e) {
       debugPrint('Error picking image from gallery: $e');
@@ -117,7 +126,8 @@ class ImageDatasource {
   Future<dynamic> pickImageWithFilePicker() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
         allowMultiple: false,
         withData: kIsWeb, // Crucial for Web to get bytes
       );

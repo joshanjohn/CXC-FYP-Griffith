@@ -5,20 +5,20 @@ import '../../../data/datasources/image_datasource.dart';
 import '../../../app/themes/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/responsive/responsive_helper.dart';
-import '../widgets/workspace_card.dart';
+import '../widgets/dashboard_card.dart';
 import '../widgets/drag_drop_zone.dart';
 import '../../../shared/widgets/adaptive_button.dart';
 import 'image_preview_page.dart';
 import 'permission_error_page.dart';
 
-class WorkspacePage extends StatefulWidget {
-  const WorkspacePage({super.key});
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
 
   @override
-  State<WorkspacePage> createState() => _WorkspacePageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _WorkspacePageState extends State<WorkspacePage> {
+class _DashboardPageState extends State<DashboardPage> {
   final ImageDatasource _imageService = ImageDatasource();
   bool _isProcessing = false;
 
@@ -367,7 +367,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return WorkspaceCard(
+    return DashboardCard(
       title: title,
       subtitle: subtitle,
       icon: icon,

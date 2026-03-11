@@ -6,6 +6,7 @@ import '../../../app/themes/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 
 import '../../../core/network/api_client.dart';
+import 'dart:io' as io;
 import 'dart:typed_data';
 
 // shows the uploaded x-ray and lets you run the model on it
@@ -53,14 +54,19 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       String filename = 'upload.jpg';
 
       if (widget.imageSource is Uint8List) {
+        // Web: raw bytes
         imageBytes = widget.imageSource as Uint8List;
+      } else if (widget.imageSource is io.File) {
+        // Mobile/Desktop: dart:io File
+        final file = widget.imageSource as io.File;
+        imageBytes = await file.readAsBytes();
+        filename = file.path.split('/').last;
       } else {
-        // try reading bytes from an XFile or similar cross-platform type
+        // XFile or similar cross-platform type (has .readAsBytes() and .name)
         try {
           imageBytes = await widget.imageSource.readAsBytes();
           filename = widget.imageSource.name ?? 'upload.jpg';
         } catch (e) {
-          // give up — unsupported source type
           throw Exception(
             'Unsupported image source type: ${widget.imageSource.runtimeType}',
           );
