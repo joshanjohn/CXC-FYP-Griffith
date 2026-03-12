@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:frontend/core/constants/app_variables.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://127.0.0.1:8080';
+  static late String baseUrl = BE_URI;
 
   static Future<Map<String, dynamic>> predictXRay(
     Uint8List imageBytes,
