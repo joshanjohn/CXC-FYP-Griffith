@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../app/themes/app_colors.dart';
-import '../../../shared/responsive/responsive_helper.dart';
-import '../../../shared/widgets/adaptive_button.dart';
+import '../../../../app/themes/app_colors.dart';
+import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../../shared/widgets/adaptive_button.dart';
 import '../widgets/auth_text_field.dart';
 import 'signup_page.dart';
+import '../../controllers/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,24 +14,45 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoggingIn = false;
+  final _authController = AuthController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _handleLogin() async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter username and security key')),
+      );
+      return;
+    }
+
     setState(() => _isLoggingIn = true);
-    // temp until real auth is wired up
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      setState(() => _isLoggingIn = false);
-      Navigator.pushReplacementNamed(context, '/');
+    
+    try {
+      await _authController.login(
+        _usernameController.text.trim(),
+        _passwordController.text,
+      );
+      
+      if (mounted) {
+        setState(() => _isLoggingIn = false);
+        Navigator.pushReplacementNamed(context, '/');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoggingIn = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
     }
   }
 
@@ -95,13 +117,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 48),
 
-                  // email & password fields
+                  // username & password fields
                   AuthTextField(
-                    controller: _emailController,
-                    label: 'IDENTIFICATION',
-                    hint: 'name@hospital.com',
+                    controller: _usernameController,
+                    label: 'USERNAME',
+                    hint: 'Enter your username',
                     icon: Icons.person_outline_rounded,
-                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 24),
                   AuthTextField(
