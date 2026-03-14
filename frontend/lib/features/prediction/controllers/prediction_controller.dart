@@ -1,17 +1,20 @@
-import 'dart:convert';
+  import 'dart:convert';
 import 'dart:typed_data';
-import 'package:frontend/core/constants/app_variables.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import '../../../core/constants/app_variables.dart';
+import '../../../core/utils/platform_url.dart';
+import '../models/prediction_response_model.dart';
 
-class ApiClient {
-  static late String baseUrl = BE_URI;
+class PredictionController {
+  //  final String _baseUrl = BE_URI; // production 
+  final String _baseUrl = resolveBackendUrl(BE_URI);
 
-  static Future<Map<String, dynamic>> predictXRay(
+  Future<PredictionResponseModel> predictXRay(
     Uint8List imageBytes,
     String filename,
   ) async {
-    final uri = Uri.parse('$baseUrl/predict');
+    final uri = Uri.parse('$_baseUrl/predict');
     final request = http.MultipartRequest('POST', uri);
 
     final multipartFile = http.MultipartFile.fromBytes(
@@ -25,13 +28,14 @@ class ApiClient {
 
     try {
       final response = await request.send();
-      final responseData = await response.stream.bytesToString();
+      final responseDataString = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        return json.decode(responseData);
+        final decodedData = json.decode(responseDataString);
+        return PredictionResponseModel.fromJson(decodedData);
       } else {
         throw Exception(
-          'Failed to get prediction: ${response.statusCode} - $responseData',
+          'Failed to get prediction: ${response.statusCode} - $responseDataString',
         );
       }
     } catch (e) {

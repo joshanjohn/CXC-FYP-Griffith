@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../app/themes/app_colors.dart';
-import '../../../shared/responsive/responsive_helper.dart';
-import '../../../shared/widgets/adaptive_button.dart';
+import '../../../../app/themes/app_colors.dart';
+import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../../shared/widgets/adaptive_button.dart';
 import '../widgets/auth_text_field.dart';
+import '../../controllers/auth_controller.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -12,26 +13,53 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isCreating = false;
+  final _authController = AuthController();
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _handleSignup() async {
+    if (_emailController.text.isEmpty || 
+        _passwordController.text.isEmpty || 
+        _usernameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
     setState(() => _isCreating = true);
-    // temp placeholder until real auth is set up
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      setState(() => _isCreating = false);
-      Navigator.pushReplacementNamed(context, '/');
+    
+    try {
+      await _authController.signup(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _usernameController.text.trim(),
+      );
+      
+      if (mounted) {
+        setState(() => _isCreating = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created! Please sign in.')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isCreating = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
     }
   }
 
@@ -92,23 +120,23 @@ class _SignupPageState extends State<SignupPage> {
 
                         // form fields
                         AuthTextField(
-                          controller: _nameController,
-                          label: 'FULL NAME',
-                          hint: 'Dr. John Doe',
-                          icon: Icons.badge_outlined,
+                          controller: _usernameController,
+                          label: 'Usernam',
+                          hint: 'Enter your username',
+                          icon: Icons.person_outline_rounded,
                         ),
                         const SizedBox(height: 24),
                         AuthTextField(
                           controller: _emailController,
-                          label: 'INSTITUTIONAL EMAIL',
-                          hint: 'name@hospital.com',
+                          label: 'EMAIL',
+                          hint: 'name@gmail.com',
                           icon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 24),
                         AuthTextField(
                           controller: _passwordController,
-                          label: 'ACCESS KEY',
+                          label: 'Password',
                           hint: 'Min. 8 characters',
                           icon: Icons.lock_outline_rounded,
                           isPassword: true,
