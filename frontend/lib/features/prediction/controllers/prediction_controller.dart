@@ -1,12 +1,14 @@
-import 'dart:convert';
+  import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../../../core/constants/app_variables.dart';
+import '../../../core/utils/platform_url.dart';
 import '../models/prediction_response_model.dart';
 
 class PredictionController {
-  final String _baseUrl = BE_URI;
+  //  final String _baseUrl = BE_URI; // production 
+  final String _baseUrl = resolveBackendUrl(BE_URI);
 
   Future<PredictionResponseModel> predictXRay(
     Uint8List imageBytes,

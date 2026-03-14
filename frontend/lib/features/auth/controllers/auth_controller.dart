@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/storage/secure_storage_service.dart';
+import '../../../core/utils/platform_url.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
 
@@ -11,7 +12,10 @@ class AuthController {
   final SecureStorageService _storageService = SecureStorageService();
 
   AuthController() {
-    _backendUri = dotenv.get('BE_URI', fallback: "http://localhost:8080");
+    // _backendUri = dotenv.get('BE_URI', fallback: "http://localhost:8080"); #production
+    _backendUri = resolveBackendUrl(
+      dotenv.get('BE_URI', fallback: 'http://localhost:8080'),
+    );
   }
 
   Future<AuthResponseModel> login(String username, String password) async {
