@@ -43,8 +43,23 @@ class AuthService:
         )
 
     def login_user(self, credentials: UserLogin) -> Token:
+
+        print(f"[AuthService] Login attempt for username: {credentials.username}")
+
+        # finding username 
         user = self.users_collection.find_one({"username": credentials.username})
-        if not user or not verify_password(credentials.password, user["hashed_password"]):
+        # checking user exist 
+        if not user:
+            print(f"[AuthService] User not found: {credentials.username}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # jwt verying password
+        if not verify_password(credentials.password, user["hashed_password"]):
+            print(f"[AuthService] Password not match for user: {credentials.username}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password",
@@ -53,9 +68,12 @@ class AuthService:
 
         user_id = str(user["_id"])
         token_data = {"sub": user_id, "username": user["username"]}
-
+        # issue tokens 
         access_token = create_access_token(data=token_data)
         refresh_token = create_refresh_token(data=token_data)
+
+        print(f"[AuthService] JWT issued for user id={user_id}")
+        print(f"[AuthService] Access token: {access_token[:30]}...")
 
         return Token(
             access_token=access_token,
@@ -64,5 +82,5 @@ class AuthService:
                 id=user_id,
                 username=user["username"],
                 email=user["email"],
-            ),
+            )
         )
