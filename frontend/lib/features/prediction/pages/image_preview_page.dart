@@ -4,8 +4,8 @@ import '../../../shared/widgets/adaptive_button.dart';
 import '../../../shared/widgets/image_display_widget.dart';
 import '../../../app/themes/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
-
-import '../../../core/network/api_client.dart';
+import '../controllers/prediction_controller.dart';
+import '../models/prediction_response_model.dart';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
@@ -22,7 +22,8 @@ class ImagePreviewPage extends StatefulWidget {
 class _ImagePreviewPageState extends State<ImagePreviewPage>
     with SingleTickerProviderStateMixin {
   bool _isAnalyzing = false;
-  Map<String, dynamic>? _analysisResults;
+  PredictionResponseModel? _analysisResults;
+  final _predictionController = PredictionController();
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
@@ -73,14 +74,13 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
         }
       }
 
-      final results = await ApiClient.predictXRay(imageBytes, filename);
+      final results = await _predictionController.predictXRay(
+        imageBytes,
+        filename,
+      );
 
       setState(() {
-        _analysisResults = {
-          'status': 'success',
-          'confidence': (results['confidence'] as num).toDouble(),
-          'diagnosis': results['prediction'] as String,
-        };
+        _analysisResults = results;
       });
     } catch (e) {
       if (!mounted) return;
@@ -270,7 +270,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   Widget _buildAnalysisResults(BuildContext context) {
     final theme = Theme.of(context);
     final results = _analysisResults!;
-    final confidence = (results['confidence'] as double) * 100;
+    final confidence = results.confidence * 100;
 
     return Container(
       width: double.infinity,
@@ -332,7 +332,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           _buildResultRow(
             context,
             'Detection Result',
-            results['diagnosis'] as String,
+            results.prediction,
             Icons.medical_services_rounded,
             AppColors.primary,
           ),
