@@ -2,17 +2,21 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import tensorflow as tf
+from fastapi import Request
 import numpy as np
 from PIL import Image
 import io
 import uvicorn
 
-from src.constants.model_names import  CXC103
+from src.constants.model_names import  CXC104
 from src.api.routers.UserAuthRoute import router as auth_router
 
-app = FastAPI()
+CLASS_NAMES = ['NORMAL', 'PNEUMONIA', 'TUBERCULOSIS', 'UNKNOWN']
+IMG_SIZE = (224, 224)
 
+app = FastAPI()
 app.include_router(auth_router)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,19 +26,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 async def load_model(): 
     # Load the model
     try:
-        model = tf.keras.models.load_model(CXC103)
-        print(f"Model loaded successfully from {CXC103}")
+        model = tf.keras.models.load_model(CXC104)
+        print(f"Model loaded successfully from {CXC104}")
     except Exception as e:
         print(f"Error loading model: {e}")
         model = None
     return model
-
-CLASS_NAMES = ['NORMAL', 'PNEUMONIA', 'TUBERCULOSIS', 'UNKNOWN']
-IMG_SIZE = (224, 224)
 
 def preprocess_image(pil_image: Image.Image, target_size=IMG_SIZE):
     if pil_image.mode != "RGB":
@@ -47,28 +47,23 @@ def preprocess_image(pil_image: Image.Image, target_size=IMG_SIZE):
     return img_array
 
 
-from fastapi import Request
-
-
-
 @app.get("/")
-async def root(request: Request): 
+async def root(request: Request) -> dict[str, str]: 
     return {"message": "CXC backend is running ... PERFECT healthy"}
 
 
 @app.get("/health")
-async def health(request: Request): 
+async def health(request: Request) -> dict[str, str]: 
     return {"status": "healthy"}
 
 
 
-
 @app.post("/predict")
-async def predict_xray(file: UploadFile = File(...)):
+async def predict_xray(file: UploadFile = File(...)) -> JSONResponse:
     model = await load_model()
     if model is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
-    
+
     try:
         contents = await file.read()
         pil_image = Image.open(io.BytesIO(contents))
@@ -80,7 +75,7 @@ async def predict_xray(file: UploadFile = File(...)):
         predicted_class = CLASS_NAMES[predicted_class_idx]
         confidence = float(prediction_probs[predicted_class_idx])
 
-        print(f"prediction: {predicted_class}, confidence: {confidence}")
+        print(f"prediction: {predicted_class},confidence: {confidence}")
         
         return JSONResponse({
             "prediction": predicted_class,
