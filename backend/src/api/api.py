@@ -9,10 +9,9 @@ import io
 import uvicorn
 
 from src.constants.model_names import  CXC104
+from src.constants.constants import CLASS_NAMES, IMG_SIZE
 from src.api.routers.UserAuthRoute import router as auth_router
 
-CLASS_NAMES = ['NORMAL', 'PNEUMONIA', 'TUBERCULOSIS', 'UNKNOWN']
-IMG_SIZE = (224, 224)
 
 app = FastAPI()
 app.include_router(auth_router)
@@ -74,6 +73,9 @@ async def predict_xray(file: UploadFile = File(...)) -> JSONResponse:
         predicted_class_idx = int(np.argmax(prediction_probs))
         predicted_class = CLASS_NAMES[predicted_class_idx]
         confidence = float(prediction_probs[predicted_class_idx])
+
+        for i in range(prediction_probs):
+            print(f"{CLASS_NAMES[i]} : {i}") 
 
         print(f"prediction: {predicted_class},confidence: {confidence}")
         
