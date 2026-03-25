@@ -74,8 +74,8 @@ async def predict_xray(file: UploadFile = File(...)) -> JSONResponse:
         predicted_class = CLASS_NAMES[predicted_class_idx]
         confidence = float(prediction_probs[predicted_class_idx])
 
-        for i in range(prediction_probs):
-            print(f"{CLASS_NAMES[i]} : {i}") 
+        # for i in range(prediction_probs):
+        #     print(f"{CLASS_NAMES[i]} : {i}") 
 
         print(f"prediction: {predicted_class},confidence: {confidence}")
         
