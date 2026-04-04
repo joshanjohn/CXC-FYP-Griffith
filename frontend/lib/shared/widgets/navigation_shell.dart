@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/themes/app_colors.dart';
 import '../../shared/responsive/responsive_helper.dart';
-import '../../features/prediction/pages/dashboad_page.dart';
+import '../../features/prediction/pages/dashboard_page.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key});

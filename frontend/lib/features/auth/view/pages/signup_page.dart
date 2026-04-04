@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../app/themes/app_colors.dart';
 import '../../../../shared/responsive/responsive_helper.dart';
+import '../../../../app/themes/app_colors.dart';
 import '../../../../shared/widgets/adaptive_button.dart';
 import '../widgets/auth_text_field.dart';
 import '../../controllers/auth_controller.dart';

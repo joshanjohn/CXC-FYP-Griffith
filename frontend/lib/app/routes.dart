@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../features/prediction/pages/dashboad_page.dart';
+import '../features/prediction/pages/dashboard_page.dart';
 import '../features/prediction/pages/image_preview_page.dart';
 import '../features/prediction/pages/permission_error_page.dart';
 import '../features/auth/view/pages/login_page.dart';
