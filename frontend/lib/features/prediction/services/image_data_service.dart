@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 enum PermissionResult { granted, denied, permanentlyDenied }
 
 /// Service for handling image selection and camera capture
-class ImageDatasource {
+class ImageDatasourceService {
   final ImagePicker _picker = ImagePicker();
   List<CameraDescription>? _cameras;
 
@@ -40,10 +40,8 @@ class ImageDatasource {
       return _mapStatusToResult(status);
     } else {
       if (Platform.isAndroid) {
-        // For Android 13+ (API 33), we need Permission.photos (READ_MEDIA_IMAGES)
-        // For older Android, we need Permission.storage (READ_EXTERNAL_STORAGE)
 
-        // Try requesting photos first (Android 13+)
+        // Try requesting photos first
         var status = await Permission.photos.request();
 
         if (status.isGranted) {

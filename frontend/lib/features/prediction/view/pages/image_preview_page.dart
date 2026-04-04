@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../shared/responsive/responsive_helper.dart';
-import '../../../shared/widgets/adaptive_button.dart';
-import '../../../shared/widgets/image_display_widget.dart';
-import '../../../app/themes/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
-import '../controllers/prediction_controller.dart';
-import '../models/prediction_response_model.dart';
+import 'package:frontend/shared/responsive/responsive_helper.dart';
+import 'package:frontend/shared/widgets/adaptive_button.dart';
+import 'package:frontend/shared/widgets/image_display_widget.dart';
+import 'package:frontend/app/themes/app_colors.dart';
+import 'package:frontend/core/constants/app_constants.dart';
+import 'package:frontend/features/prediction/controllers/prediction_controller.dart';
+import 'package:frontend/features/prediction/models/prediction_response_model.dart';
+import 'package:frontend/features/prediction/view/widgets/prediction_chart.dart';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
@@ -363,6 +364,10 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
               AppColors.accent,
             ),
           ],
+          const SizedBox(height: 32),
+          const Divider(height: 1),
+          const SizedBox(height: 32),
+          PredictionChart(allConfidences: results.allConfidences),
         ],
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../app/themes/app_colors.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:frontend/app/themes/app_colors.dart';
+import 'package:frontend/core/constants/app_constants.dart';
 
 /// Adaptive button widget with platform-specific styling
 class AdaptiveButton extends StatefulWidget {

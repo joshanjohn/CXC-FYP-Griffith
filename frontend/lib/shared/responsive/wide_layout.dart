@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/prediction/widgets/image_uploader.dart';
+import 'package:frontend/features/prediction/view/widgets/image_uploader.dart';
 
 class WideLayout extends StatelessWidget {
   const WideLayout({super.key});

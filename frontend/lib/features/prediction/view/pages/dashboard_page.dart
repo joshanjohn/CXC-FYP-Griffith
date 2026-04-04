@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../data/datasources/image_datasource.dart';
-import '../../../app/themes/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../shared/responsive/responsive_helper.dart';
-import '../widgets/dashboard_card.dart';
-import '../widgets/drag_drop_zone.dart';
-import '../../../shared/widgets/adaptive_button.dart';
+import 'package:frontend/features/prediction/services/image_data_service.dart';
+import 'package:frontend/app/themes/app_colors.dart';
+import 'package:frontend/core/constants/app_constants.dart';
+import 'package:frontend/shared/responsive/responsive_helper.dart';
+import 'package:frontend/features/prediction/view/widgets/dashboard_card.dart';
+import 'package:frontend/features/prediction/view/widgets/drag_drop_zone.dart';
+import 'package:frontend/shared/widgets/adaptive_button.dart';
 import 'image_preview_page.dart';
 import 'permission_error_page.dart';
 
@@ -19,7 +19,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final ImageDatasource _imageService = ImageDatasource();
+  final ImageDatasourceService _imageService = ImageDatasourceService();
   bool _isProcessing = false;
 
   @override

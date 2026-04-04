@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import '../../../core/constants/app_variables.dart';
-import '../../../core/utils/platform_url.dart';
-import '../../features/prediction/models/prediction_response_model.dart';
-import '../../../core/storage/secure_storage_service.dart';
+import 'package:frontend/core/constants/app_variables.dart';
+import 'package:frontend/core/utils/platform_url.dart';
+import 'package:frontend/features/prediction/models/prediction_response_model.dart';
+import 'package:frontend/core/storage/secure_storage_service.dart';
 
 class PredictionService {
   final String _baseUrl = resolveBackendUrl(BE_URI);

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../features/prediction/pages/dashboard_page.dart';
-import '../features/prediction/pages/image_preview_page.dart';
-import '../features/prediction/pages/permission_error_page.dart';
-import '../features/auth/view/pages/login_page.dart';
-import '../features/auth/view/pages/signup_page.dart';
+import 'package:frontend/features/prediction/view/pages/dashboard_page.dart';
+import 'package:frontend/features/prediction/view/pages/image_preview_page.dart';
+import 'package:frontend/features/prediction/view/pages/permission_error_page.dart';
+import 'package:frontend/features/auth/view/pages/login_page.dart';
+import 'package:frontend/features/auth/view/pages/signup_page.dart';
 
-import '../shared/widgets/navigation_shell.dart';
+import 'package:frontend/shared/widgets/navigation_shell.dart';
 
 class AppRoutes {
   static const String initial = '/login';

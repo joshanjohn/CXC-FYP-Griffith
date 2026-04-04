@@ -24,10 +24,10 @@ class AppConstants {
   static const double radiusLarge = 24.0;
   static const double radiusExtraLarge = 32.0;
 
-  // Asset Paths (Placeholders for now)
+  // Asset Paths (Placeholders)
   static const String logoPath = 'assets/icons/logo.png';
 
-  // Strings
+  // Const app Strings
   static const String homeTitle = 'ML-Powered\nX-Ray Analysis';
   static const String homeSubtitle =
       'Education prupose ML tool for classifying chest xrays into normal, pneumonia, or tuberculosis.';
@@ -36,7 +36,7 @@ class AppConstants {
   static const String permissionErrorSubtitle =
       'This app requires camera and storage access to provide medical analysis.';
 
-  // Analysis Strings
+  // Analysis strings
   static const String analysisTitle = 'Diagnostic Preview';
   static const String analysisComplete = 'Analysis complete.';
   static const String analysisScanning = 'AI is scanning the X-Ray...';

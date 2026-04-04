@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import '../../../data/services/prediction_service.dart' as api;
+import '../services/prediction_service.dart' as api;
 import '../models/prediction_response_model.dart';
 
 class PredictionController {
