@@ -27,6 +27,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
+  String _selectedModel = 'default';
+  List<String> _availableModels = ['default'];
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +42,19 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
     _slideController.forward();
+    _fetchModels();
+  }
+
+  Future<void> _fetchModels() async {
+    final models = await _predictionController.getAvailableModels();
+    if (mounted) {
+      setState(() {
+        _availableModels = models;
+        if (!_availableModels.contains(_selectedModel)) {
+          _selectedModel = _availableModels.isNotEmpty ? _availableModels.first : 'default';
+        }
+      });
+    }
   }
 
   @override
@@ -77,6 +93,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       final results = await _predictionController.predictXRay(
         imageBytes,
         filename,
+        modelName: _selectedModel,
       );
 
       setState(() {
@@ -109,7 +126,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           children: [
             AppBar(
               title: Text(
-                'Diagnostic Preview',
+                AppConstants.analysisTitle,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.5,
@@ -252,10 +269,10 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           Expanded(
             child: Text(
               _isAnalyzing
-                  ? 'AI is scanning the X-Ray...'
+                  ? AppConstants.analysisScanning
                   : (_analysisResults == null
-                        ? 'Ready for processing. Tap analyze to begin.'
-                        : 'Analysis complete.'),
+                        ? AppConstants.analysisReady
+                        : AppConstants.analysisComplete),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w600,
@@ -336,6 +353,16 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             Icons.medical_services_rounded,
             AppColors.primary,
           ),
+          if (results.modelUsed != null) ...[
+            const SizedBox(height: 16),
+            _buildResultRow(
+              context,
+              'AI Model Used',
+              results.modelUsed!.toUpperCase(),
+              Icons.settings_suggest_rounded,
+              AppColors.accent,
+            ),
+          ],
         ],
       ),
     );
@@ -395,6 +422,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
     if (isMobile) {
       return Column(
         children: [
+          _buildModelDropdown(context),
+          const SizedBox(height: 16),
           AdaptiveButton(
             text: _analysisResults == null ? 'Analyze Scan' : 'Re-Analyze',
             onPressed: _analyzeImage,
@@ -417,32 +446,80 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       return Center(
         child: SizedBox(
           width: 500,
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: AdaptiveButton(
-                  text: 'Discard',
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icons.delete_sweep_rounded,
-                  isPrimary: false,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: AdaptiveButton(
-                  text: _analysisResults == null
-                      ? 'Process Scan'
-                      : 'Re-Analyze',
-                  onPressed: _analyzeImage,
-                  icon: Icons.biotech_rounded,
-                  isLoading: _isAnalyzing,
-                  isPrimary: true,
-                ),
+              _buildModelDropdown(context),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: AdaptiveButton(
+                      text: 'Discard',
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icons.delete_sweep_rounded,
+                      isPrimary: false,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: AdaptiveButton(
+                      text: _analysisResults == null
+                          ? 'Process Scan'
+                          : 'Re-Analyze',
+                      onPressed: _analyzeImage,
+                      icon: Icons.biotech_rounded,
+                      isLoading: _isAnalyzing,
+                      isPrimary: true,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       );
     }
+  }
+
+  Widget _buildModelDropdown(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        border: Border.all(color: AppColors.outlineLight),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedModel,
+          isExpanded: true,
+          dropdownColor: isDark ? AppColors.surfaceDark : Colors.white,
+          icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+          onChanged: _isAnalyzing
+              ? null
+              : (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedModel = newValue;
+                    });
+                  }
+                },
+          items: _availableModels.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text('Model: ${value.toUpperCase()}'),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 }
