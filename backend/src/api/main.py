@@ -31,5 +31,7 @@ async def root(request: Request) -> dict[str, str]:
 async def health(request: Request) -> dict[str, str]: 
     return {"status": "healthy"}
 
+from src.constants.variables import PORT
+
 if __name__ == "__main__":
-    uvicorn.run("src.api.main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("src.api.main:app", host="0.0.0.0", port=int(PORT) if PORT else 8080, reload=True)
