@@ -35,4 +35,10 @@ class AppConstants {
   static const String permissionErrorTitle = 'Permissions Required';
   static const String permissionErrorSubtitle =
       'This app requires camera and storage access to provide medical analysis.';
+
+  // Analysis Strings
+  static const String analysisTitle = 'Diagnostic Preview';
+  static const String analysisComplete = 'Analysis complete.';
+  static const String analysisScanning = 'AI is scanning the X-Ray...';
+  static const String analysisReady = 'Ready for processing. Tap analyze to begin.';
 }
