@@ -1,8 +1,12 @@
-from fastapi import APIRouter, File, UploadFile, Query, HTTPException
+from fastapi import APIRouter, File, UploadFile, Query, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from src.api.services.PredictionService import PredictionService
+from src.utils.api_deps import get_current_user
 
-router = APIRouter(tags=["prediction"])
+router = APIRouter(
+    tags=["prediction"],
+    dependencies=[Depends(get_current_user)]
+)
 
 prediction_service = PredictionService()
 
