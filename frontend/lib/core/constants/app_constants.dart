@@ -30,8 +30,9 @@ class AppConstants {
   // Const app Strings
   static const String homeTitle = 'ML-Powered\nX-Ray Analysis';
   static const String homeSubtitle =
-      'Education prupose ML tool for classifying chest xrays into normal, pneumonia, or tuberculosis.';
-  static const String homeWarning = 'Note: predictions doesn\'t determine real world outcome';
+      'Educational ML tool for classifying chest X-rays into Normal, Tuberculosis, Pneumonia, or Unknown.';
+  static const String homeWarning =
+      'Note: predictions don\'t determine real world outcome';
   static const String permissionErrorTitle = 'Permissions Required';
   static const String permissionErrorSubtitle =
       'This app requires camera and storage access to provide medical analysis.';
@@ -40,5 +41,6 @@ class AppConstants {
   static const String analysisTitle = 'Diagnostic Preview';
   static const String analysisComplete = 'Analysis complete.';
   static const String analysisScanning = 'AI is scanning the X-Ray...';
-  static const String analysisReady = 'Ready for processing. Tap analyze to begin.';
+  static const String analysisReady =
+      'Ready for processing. Tap analyze to begin.';
 }
