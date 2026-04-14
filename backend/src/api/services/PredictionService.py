@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import io
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile, HTTPException
 from src.constants.model_names import AVAILABLE_MODELS, DEFAULT
 from src.constants.constants import CLASS_NAMES
@@ -49,7 +49,10 @@ class PredictionService:
 
         try:
             contents = await file.read()
+            if not contents:
+                raise HTTPException(status_code=400, detail="Uploaded file is empty")
             pil_image = Image.open(io.BytesIO(contents))
+            pil_image.load()
             img_array = ImageUtils.preprocess_image(pil_image)
             
             prediction_probs = model.predict(img_array)[0]
@@ -67,9 +70,13 @@ class PredictionService:
                 "prediction": predicted_class,
                 "confidence": confidence,
                 "all_confidences": all_confidences,
-                "model_used": model_name if model_name and model_name.lower() != "default" else "default"
+                "model_used": model_name if model_name and model_name.lower() != "default" else "default",
+                "filename": file.filename,
             }
-            
+        except HTTPException:
+            raise
+        except UnidentifiedImageError:
+            raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
         except Exception as e:
             print(f"Prediction error: {e}")
             raise HTTPException(status_code=500, detail=str(e))
