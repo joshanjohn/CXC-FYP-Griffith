@@ -58,11 +58,15 @@ class PredictionService:
             predicted_class = CLASS_NAMES[predicted_class_idx]
             confidence = float(prediction_probs[predicted_class_idx])
 
+            # Create a dictionary of all class confidences
+            all_confidences = {CLASS_NAMES[i]: float(prediction_probs[i]) for i in range(len(CLASS_NAMES))}
+            
             print(f"Model: {model_name or 'default'}, Prediction: {predicted_class}, Confidence: {confidence}")
             
             return {
                 "prediction": predicted_class,
                 "confidence": confidence,
+                "all_confidences": all_confidences,
                 "model_used": model_name if model_name and model_name.lower() != "default" else "default"
             }
             
