@@ -3,6 +3,8 @@ import 'package:frontend/app/themes/app_colors.dart';
 import 'package:frontend/shared/responsive/responsive_helper.dart';
 import 'package:frontend/features/prediction/view/pages/dashboard_page.dart';
 
+import 'package:frontend/app/routes.dart';
+
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
 
@@ -27,7 +29,6 @@ class MainShell extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // logo
           Row(
             children: [
               Container(
@@ -49,9 +50,49 @@ class MainShell extends StatelessWidget {
                   letterSpacing: 2,
                 ),
               ),
+              const SizedBox(width: 48),
+              _buildNavButton(
+                context,
+                label: 'Dashboard',
+                isActive: true,
+                onTap: () {},
+              ),
+              const SizedBox(width: 24),
+              _buildNavButton(
+                context,
+                label: 'Batch Classification',
+                isActive: false,
+                onTap: () => Navigator.pushNamed(context, AppRoutes.batch),
+              ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(
+    BuildContext context, {
+    required String label,
+    required bool isActive,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+            color: isActive ? AppColors.primary : null,
+          ),
+        ),
       ),
     );
   }
