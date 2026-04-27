@@ -192,6 +192,7 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final isMobile = ResponsiveHelper.isMobile(context);
 
     return Scaffold(
       body: SafeArea(
@@ -201,31 +202,50 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(theme),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left Side: Upload & Control
-                    Expanded(
-                      flex: 2,
-                      child: Column(
+                child: isMobile
+                    ? Column(
                         children: [
                           _buildUploadArea(isDark, theme),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
                           if (_selectedFiles.isNotEmpty)
                             _buildControlPanel(theme),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
                           if (_aggregation.isNotEmpty)
                             _buildAggregationStats(theme),
+                          const SizedBox(height: 24),
+                          Expanded(
+                            child: _buildResultsList(theme, isDark),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left Side: Upload & Control
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              children: [
+                                _buildUploadArea(isDark, theme),
+                                const SizedBox(height: 24),
+                                if (_selectedFiles.isNotEmpty)
+                                  _buildControlPanel(theme),
+                                const SizedBox(height: 24),
+                                if (_aggregation.isNotEmpty)
+                                  _buildAggregationStats(theme),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 32),
+                          // Right Side: Real-time Results
+                          Expanded(
+                            flex: 3,
+                            child: _buildResultsList(theme, isDark),
+                          ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 32),
-                    // Right Side: Real-time Results
-                    Expanded(flex: 3, child: _buildResultsList(theme, isDark)),
-                  ],
-                ),
               ),
             ],
           ),
@@ -235,16 +255,19 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
   }
 
   Widget _buildHeader(ThemeData theme) {
+    final canPop = Navigator.canPop(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back),
-            ),
-            const SizedBox(width: 8),
+            if (canPop) ...[
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back),
+              ),
+              const SizedBox(width: 8),
+            ],
             Text(
               'Batch Classifier',
               style: theme.textTheme.headlineMedium?.copyWith(
@@ -255,7 +278,7 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
           ],
         ),
         Padding(
-          padding: EdgeInsets.only(left: 48),
+          padding: EdgeInsets.only(left: canPop ? 48 : 0),
           child: Text(
             'Stream and classify multiple X-ray scans in real-time.',
             style: theme.textTheme.bodySmall,
