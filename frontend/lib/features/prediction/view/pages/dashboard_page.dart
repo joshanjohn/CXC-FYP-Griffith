@@ -12,7 +12,8 @@ import 'image_preview_page.dart';
 import 'permission_error_page.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final bool startWithCamera;
+  const DashboardPage({super.key, this.startWithCamera = false});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -26,6 +27,11 @@ class _DashboardPageState extends State<DashboardPage> {
   void initState() {
     super.initState();
     _imageService.initializeCameras();
+    if (widget.startWithCamera) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleImageSelection(fromCamera: true);
+      });
+    }
   }
 
   Future<void> _handleImageSelection({

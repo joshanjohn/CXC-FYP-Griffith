@@ -15,7 +15,7 @@ class BatchZipDownload {
 }
 
 class PredictionService {
-  final String _baseUrl = resolveBackendUrl(BE_URI);
+  final String _baseUrl = resolveBackendUrl(beUri);
   final SecureStorageService _storageService = SecureStorageService();
 
   MediaType _contentTypeForFilename(String filename) {

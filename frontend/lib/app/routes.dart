@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/prediction/view/pages/dashboard_page.dart';
+import 'package:frontend/features/prediction/view/pages/batch_prediction_page.dart';
 import 'package:frontend/features/prediction/view/pages/image_preview_page.dart';
 import 'package:frontend/features/prediction/view/pages/permission_error_page.dart';
 import 'package:frontend/features/auth/view/pages/login_page.dart';
@@ -15,12 +16,14 @@ class AppRoutes {
   static const String error = '/error';
   static const String login = '/login';
   static const String signup = '/signup';
+  static const String batch = '/batch';
 
   static Map<String, WidgetBuilder> get routes => {
     shell: (context) => const MainShell(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),
     workspace: (context) => const DashboardPage(),
+    batch: (context) => const BatchPredictionPage(),
     error: (context) =>
         const PermissionErrorPage(permissionName: '', description: ''),
   };
