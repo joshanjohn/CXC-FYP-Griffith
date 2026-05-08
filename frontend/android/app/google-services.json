@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "720000950817",
+    "project_id": "ticker-24113",
+    "storage_bucket": "ticker-24113.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720000950817:android:0cab41596f3195d615f960",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfJCLych5HEFvT2h91-g9pZLArnZ4QemU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720000950817:android:4fa1d9601c2def0a15f960",
+        "android_client_info": {
+          "package_name": "com.ticker.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfJCLych5HEFvT2h91-g9pZLArnZ4QemU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

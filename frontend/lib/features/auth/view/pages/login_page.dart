@@ -15,41 +15,41 @@ class LoginPage extends StatefulWidget {
 
 
 class _LoginPageState extends State<LoginPage> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoggingIn = false;
-  final _authController = AuthController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool isLoggingIn = false;
+  final authController = AuthController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() async {
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+  void handleLogin() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter username and security key')),
+        const SnackBar(content: Text('Please enter email and password')),
       );
       return;
     }
 
-    setState(() => _isLoggingIn = true);
+    setState(() => isLoggingIn = true);
     
     try {
-      await _authController.login(
-        _usernameController.text.trim(),
-        _passwordController.text,
+      await authController.login(
+        emailController.text.trim(),
+        passwordController.text,
       );
       
       if (mounted) {
-        setState(() => _isLoggingIn = false);
+        setState(() => isLoggingIn = false);
         Navigator.pushReplacementNamed(context, '/');
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoggingIn = false);
+        setState(() => isLoggingIn = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
         );
@@ -118,17 +118,17 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 48),
 
-                  // username & password fields
+                  // email & password fields
                   AuthTextField(
-                    controller: _usernameController,
-                    label: 'USERNAME',
-                    hint: 'Enter your username',
-                    icon: Icons.person_outline_rounded,
+                    controller: emailController,
+                    label: 'EMAIL ADDRESS',
+                    hint: 'Enter your email',
+                    icon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 24),
                   AuthTextField(
-                    controller: _passwordController,
-                    label: 'SECURITY KEY',
+                    controller: passwordController,
+                    label: 'PASSWORD',
                     hint: '••••••••',
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
@@ -154,8 +154,8 @@ class _LoginPageState extends State<LoginPage> {
                   // login button
                   AdaptiveButton(
                     text: 'Enter Workspace',
-                    onPressed: _handleLogin,
-                    isLoading: _isLoggingIn,
+                    onPressed: handleLogin,
+                    isLoading: isLoggingIn,
                     width: double.infinity,
                   ),
                   const SizedBox(height: 24),
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "New to the network?",
+                        "Don't have an account?",
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha: 0.4),
                         ),
@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                         child: const Text(
-                          'Request Access',
+                          'Create Account',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,

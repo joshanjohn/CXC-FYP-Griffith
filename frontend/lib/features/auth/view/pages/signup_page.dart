@@ -121,7 +121,7 @@ class _SignupPageState extends State<SignupPage> {
                         // form fields
                         AuthTextField(
                           controller: _usernameController,
-                          label: 'Usernam',
+                          label: 'Username',
                           hint: 'Enter your username',
                           icon: Icons.person_outline_rounded,
                         ),

@@ -1,100 +1,55 @@
-import 'dart:convert';
 import 'dart:developer' as dev;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import '../../../core/storage/secure_storage_service.dart';
-import '../../../core/utils/platform_url.dart';
-import '../models/auth_response_model.dart';
-import '../models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthController {
-  late String _backendUri;
-  final SecureStorageService _storageService = SecureStorageService();
+  final FirebaseAuth firebase_auth = FirebaseAuth.instance;
 
-  AuthController() {
-    // _backendUri = dotenv.get('BE_URI', fallback: "http://localhost:8080"); #production
-    _backendUri = resolveBackendUrl(
-      dotenv.get('BE_URI', fallback: 'http://localhost:8080'),
-    );
-  }
-
-  Future<AuthResponseModel> login(String username, String password) async {
-    final uri = Uri.parse('$_backendUri/auth/login');
-
-    dev.log('[AuthController] POST $uri | username=$username');
-
+  Future<UserCredential> login(String email, String password) async {
+    dev.log('[AuthController] Login attempt for email: $email');
     try {
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': username,
-          'password': password,
-        }),
+      final UserCredential userCredential = await firebase_auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-
-      dev.log('[AuthController] Response status: ${response.statusCode}');
-      dev.log('[AuthController] Response body: ${response.body}');
-
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        final authResponse = AuthResponseModel.fromJson(responseData);
-
-        dev.log('[AuthController] JWT received!');
-        dev.log('[AuthController] Access token: ${authResponse.accessToken}');
-        dev.log('[AuthController] Refresh token: ${authResponse.refreshToken}\n');
-        dev.log('[AuthController] User id: ${authResponse.user.id}');
-
-        await _storageService.saveTokens(
-          accessToken: authResponse.accessToken,
-          refreshToken: authResponse.refreshToken,
-        );
-
-        await _storageService.saveUserCredentials(
-          userId: authResponse.user.id,
-          userName: authResponse.user.username,
-        );
-
-        dev.log('[AuthController] Tokens and credentials saved to secure storage.');
-        return authResponse;
-      } else {
-        dev.log('[AuthController] Login failed: ${responseData["detail"]}');
-        throw Exception(responseData['detail'] ?? 'Failed to login');
-      }
+      dev.log('[AuthController] Login successful for user: ${userCredential.user?.uid}');
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      dev.log('[AuthController] FirebaseAuthException: ${e.code} - ${e.message}');
+      throw Exception(e.message ?? 'An unknown error occurred during login');
     } catch (e) {
-      dev.log('[AuthController] Exception: $e');
-      throw Exception('Login error: $e');
+      dev.log('[AuthController] Login error: $e');
+      throw Exception('An error occurred during login');
     }
   }
 
-  Future<UserModel> signup(String email, String password, String username) async {
-    final uri = Uri.parse('$_backendUri/auth/signup');
-    
+  Future<UserCredential> signup(String email, String password, String username) async {
+    dev.log('[AuthController] Signup attempt for email: $email');
     try {
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'username': username,
-        }),
+      final UserCredential userCredential = await firebase_auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return UserModel.fromJson(responseData);
-      } else {
-        throw Exception(responseData['detail'] ?? 'Failed to signup');
-      }
+      
+      // Update display name with the username
+      await userCredential.user?.updateDisplayName(username);
+      
+      dev.log('[AuthController] Signup successful for user: ${userCredential.user?.uid}');
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      dev.log('[AuthController] FirebaseAuthException: ${e.code} - ${e.message}');
+      throw Exception(e.message ?? 'An unknown error occurred during signup');
     } catch (e) {
-      throw Exception('Signup error: $e');
+      dev.log('[AuthController] Signup error: $e');
+      throw Exception('An error occurred during signup');
     }
   }
 
   Future<void> logout() async {
-    await _storageService.clearAll();
+    await firebase_auth.signOut();
+    dev.log('[AuthController] User logged out');
   }
+
+  User? get currentUser => firebase_auth.currentUser;
+
+  Stream<User?> get authStateChanges => firebase_auth.authStateChanges();
 }
