@@ -40,7 +40,6 @@ String _buildUniquePath(String directoryPath, String filename) {
   var candidate = '$directoryPath$separator$safeFilename';
   var counter = 1;
 
-  // If file exists, keep adding _1, _2, etc.
   while (File(candidate).existsSync()) {
     candidate = '$directoryPath$separator${name}_$counter$extension';
     counter++;
