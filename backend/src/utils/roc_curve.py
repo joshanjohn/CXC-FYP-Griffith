@@ -3,7 +3,7 @@ from sklearn.metrics import roc_curve, auc
 import numpy as np
 import matplotlib.pyplot as plt
 
-def generate_roc_curve(dataset, model):
+def generate_roc_curve(dataset, model, title: str):
     class_names = dataset.class_names
     y_pred_prob = []
     y_true = []
@@ -35,6 +35,6 @@ def generate_roc_curve(dataset, model):
 
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
-    plt.title("ROC Curve")
+    plt.title(title)
     plt.legend()
     plt.show()

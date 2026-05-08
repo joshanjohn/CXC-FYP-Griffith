@@ -30,7 +30,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                     google_requests.Request(),
                     audience=FIREBASE_PROJECT_ID
                 )
-                print("DEBUG: Fallback verification successful!")
+                print("DEBUG: verification successful!")
                 return decoded_token
             except Exception as fallback_e:
                 print(f"DEBUG: Fallback verification also failed: {fallback_e}")

@@ -11,7 +11,7 @@ class PredictionService:
     def __init__(self):
         self.model_cache = {}
 
-    async def _get_model(self, model_alias: str = None):
+    async def get_model(self, model_alias: str = None):
         """
         return a model using its alias or model name. If no alias is provided, it use the default model (DEFAULT).
         """
@@ -35,17 +35,19 @@ class PredictionService:
 
         return self.model_cache[model_key]
 
+
     def get_available_models(self):
         """
         function to return a list of available model aliases.
         """
         return list(AVAILABLE_MODELS.keys())
+    
 
     async def predict(self, file: UploadFile, model_name: str = None):
         """
         function to return prediction for an uploaded file using the specified model.
         """
-        model = await self._get_model(model_name)
+        model = await self.get_model(model_name)
 
         try:
             contents = await file.read()
