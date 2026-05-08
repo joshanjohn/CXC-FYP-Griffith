@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import io
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile, HTTPException
 from src.constants.model_names import AVAILABLE_MODELS, DEFAULT
 from src.constants.constants import CLASS_NAMES
@@ -11,7 +11,7 @@ class PredictionService:
     def __init__(self):
         self.model_cache = {}
 
-    async def _get_model(self, model_alias: str = None):
+    async def get_model(self, model_alias: str = None):
         """
         return a model using its alias or model name. If no alias is provided, it use the default model (DEFAULT).
         """
@@ -35,21 +35,26 @@ class PredictionService:
 
         return self.model_cache[model_key]
 
+
     def get_available_models(self):
         """
         function to return a list of available model aliases.
         """
         return list(AVAILABLE_MODELS.keys())
+    
 
     async def predict(self, file: UploadFile, model_name: str = None):
         """
         function to return prediction for an uploaded file using the specified model.
         """
-        model = await self._get_model(model_name)
+        model = await self.get_model(model_name)
 
         try:
             contents = await file.read()
+            if not contents:
+                raise HTTPException(status_code=400, detail="Uploaded file is empty")
             pil_image = Image.open(io.BytesIO(contents))
+            pil_image.load()
             img_array = ImageUtils.preprocess_image(pil_image)
             
             prediction_probs = model.predict(img_array)[0]
@@ -58,14 +63,22 @@ class PredictionService:
             predicted_class = CLASS_NAMES[predicted_class_idx]
             confidence = float(prediction_probs[predicted_class_idx])
 
+            # Create a dictionary of all class confidences
+            all_confidences = {CLASS_NAMES[i]: float(prediction_probs[i]) for i in range(len(CLASS_NAMES))}
+            
             print(f"Model: {model_name or 'default'}, Prediction: {predicted_class}, Confidence: {confidence}")
             
             return {
                 "prediction": predicted_class,
                 "confidence": confidence,
-                "model_used": model_name if model_name and model_name.lower() != "default" else "default"
+                "all_confidences": all_confidences,
+                "model_used": model_name if model_name and model_name.lower() != "default" else "default",
+                "filename": file.filename,
             }
-            
+        except HTTPException:
+            raise
+        except UnidentifiedImageError:
+            raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
         except Exception as e:
             print(f"Prediction error: {e}")
             raise HTTPException(status_code=500, detail=str(e))

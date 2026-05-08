@@ -8,11 +8,22 @@ from PIL import Image
 import io
 import uvicorn
 
-from src.api.routers.UserAuthRoute import router as auth_router
+import firebase_admin
+from firebase_admin import credentials
+
+from src.constants.variables import FIREBASE_PROJECT_ID
+# Initialize Firebase Admin
+if not firebase_admin._apps:
+    try:
+        firebase_admin.initialize_app(options={'projectId': FIREBASE_PROJECT_ID})
+        print(f"Firebase initialized with project: {FIREBASE_PROJECT_ID}")
+    except Exception as e:
+        print(f"Error initializing Firebase: {e}")
+        firebase_admin.initialize_app() # Fallback
+
 from src.api.routers.PredictionRoute import router as prediction_router
 
 app = FastAPI()
-app.include_router(auth_router)
 app.include_router(prediction_router)
 
 app.add_middleware(
