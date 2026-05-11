@@ -5,6 +5,7 @@ import 'package:frontend/app/themes/app_colors.dart';
 import 'package:frontend/core/constants/app_constants.dart';
 
 /// Widget for displaying images responsively across different screen sizes
+
 class ImageDisplayWidget extends StatelessWidget {
   final dynamic imageSource; // Can be XFile, File, or String path
   final double? maxHeight;
@@ -45,44 +46,44 @@ class ImageDisplayWidget extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-        child: _buildImage(theme),
+        child: buildImage(theme),
       ),
     );
   }
 
-  Widget _buildImage(ThemeData theme) {
+  Widget buildImage(ThemeData theme) {
     if (imageSource is Uint8List) {
-      // Memory: used for Web or whenever raw bytes are provided
+      // Memory used for Web or whenever raw bytes are provided
       return Image.memory(
         imageSource,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(theme),
+        errorBuilder: (context, error, stackTrace) => buildErrorWidget(theme),
       );
     }
 
     if (kIsWeb) {
-      // Web: handle network or local blob URLs (if passed as string)
+      // Web handle network or local blob URLs (if passed as string)
       if (imageSource is String) {
         return Image.network(
           imageSource,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-            return _buildErrorWidget(theme);
+            return buildErrorWidget(theme);
           },
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
-            return _buildLoadingWidget();
+            return buildLoadingWidget();
           },
         );
       }
     } else {
-      // Mobile/Desktop: handle File or path strings
+      // Mobile/Desktop handle File or path strings
       if (imageSource is File) {
         return Image.file(
           imageSource,
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-            return _buildErrorWidget(theme);
+            return buildErrorWidget(theme);
           },
         );
       } else if (imageSource is String) {
@@ -90,23 +91,23 @@ class ImageDisplayWidget extends StatelessWidget {
           File(imageSource),
           fit: fit,
           errorBuilder: (context, error, stackTrace) {
-            return _buildErrorWidget(theme);
+            return buildErrorWidget(theme);
           },
         );
       }
     }
 
-    return _buildErrorWidget(theme);
+    return buildErrorWidget(theme);
   }
 
-  Widget _buildLoadingWidget() {
+  Widget buildLoadingWidget() {
     return Container(
       color: Colors.grey[200],
       child: const Center(child: CircularProgressIndicator()),
     );
   }
 
-  Widget _buildErrorWidget(ThemeData theme) {
+  Widget buildErrorWidget(ThemeData theme) {
     return Container(
       color: AppColors.error.withValues(alpha: 0.1),
       child: Center(
