@@ -22,37 +22,37 @@ class ImagePreviewPage extends StatefulWidget {
 
 class _ImagePreviewPageState extends State<ImagePreviewPage>
     with SingleTickerProviderStateMixin {
-  bool _isAnalyzing = false;
-  PredictionResponseModel? _analysisResults;
-  final _predictionController = PredictionController();
-  late AnimationController _slideController;
-  late Animation<Offset> _slideAnimation;
+  bool isAnalyzing = false;
+  PredictionResponseModel? analysisResults;
+  final predictionController = PredictionController();
+  late AnimationController slideController;
+  late Animation<Offset> slideAnimation;
 
-  String _selectedModel = 'default';
-  List<String> _availableModels = ['default'];
+  String selectedModel = 'default';
+  List<String> availableModels = ['default'];
 
   @override
   void initState() {
     super.initState();
-    _slideController = AnimationController(
+    slideController = AnimationController(
       duration: AppConstants.mediumAnimation,
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(
+    slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
-    _slideController.forward();
+    ).animate(CurvedAnimation(parent: slideController, curve: Curves.easeOut));
+    slideController.forward();
     _fetchModels();
   }
 
   Future<void> _fetchModels() async {
-    final models = await _predictionController.getAvailableModels();
+    final models = await predictionController.getAvailableModels();
     if (mounted) {
       setState(() {
-        _availableModels = models;
-        if (!_availableModels.contains(_selectedModel)) {
-          _selectedModel = _availableModels.isNotEmpty ? _availableModels.first : 'default';
+        availableModels = models;
+        if (!availableModels.contains(selectedModel)) {
+          selectedModel = availableModels.isNotEmpty ? availableModels.first : 'default';
         }
       });
     }
@@ -60,12 +60,12 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
 
   @override
   void dispose() {
-    _slideController.dispose();
+    slideController.dispose();
     super.dispose();
   }
 
   Future<void> _analyzeImage() async {
-    setState(() => _isAnalyzing = true);
+    setState(() => isAnalyzing = true);
 
     try {
       Uint8List imageBytes;
@@ -91,14 +91,14 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
         }
       }
 
-      final results = await _predictionController.predictXRay(
+      final results = await predictionController.predictXRay(
         imageBytes,
         filename,
-        modelName: _selectedModel,
+        modelName: selectedModel,
       );
 
       setState(() {
-        _analysisResults = results;
+        analysisResults = results;
       });
     } catch (e) {
       if (!mounted) return;
@@ -110,7 +110,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       );
     } finally {
       setState(() {
-        _isAnalyzing = false;
+        isAnalyzing = false;
       });
     }
   }
@@ -148,7 +148,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             ),
             Expanded(
               child: SlideTransition(
-                position: _slideAnimation,
+                position: slideAnimation,
                 child: Center(
                   child: SingleChildScrollView(
                     padding: ResponsiveHelper.getResponsivePadding(context),
@@ -161,16 +161,16 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                               children: [
                                 _buildImageCard(context, isDark, isMobile),
                                 const SizedBox(height: 32),
-                                if (_isAnalyzing) ...[
+                                if (isAnalyzing) ...[
                                   const Center(
                                     child: CircularProgressIndicator(),
                                   ),
                                   const SizedBox(height: 32),
-                                ] else if (_analysisResults != null) ...[
+                                ] else if (analysisResults != null) ...[
                                   _buildAnalysisResults(context),
                                   const SizedBox(height: 32),
                                 ],
-                                if (!_isAnalyzing) _buildActionButtons(context),
+                                if (!isAnalyzing) _buildActionButtons(context),
                                 const SizedBox(height: 24),
                                 _buildModernStatusCard(context, theme, isDark),
                               ],
@@ -193,16 +193,16 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                                   flex: 2,
                                   child: Column(
                                     children: [
-                                      if (_isAnalyzing) ...[
+                                      if (isAnalyzing) ...[
                                         const Center(
                                           child: CircularProgressIndicator(),
                                         ),
                                         const SizedBox(height: 32),
-                                      ] else if (_analysisResults != null) ...[
+                                      ] else if (analysisResults != null) ...[
                                         _buildAnalysisResults(context),
                                         const SizedBox(height: 32),
                                       ],
-                                      if (!_isAnalyzing)
+                                      if (!isAnalyzing)
                                         _buildActionButtons(context),
                                       const SizedBox(height: 24),
                                       _buildModernStatusCard(
@@ -260,18 +260,18 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       child: Row(
         children: [
           Icon(
-            _isAnalyzing
+            isAnalyzing
                 ? Icons.hourglass_empty_rounded
                 : Icons.verified_rounded,
-            color: _isAnalyzing ? AppColors.warning : AppColors.success,
+            color: isAnalyzing ? AppColors.warning : AppColors.success,
             size: 24,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              _isAnalyzing
+              isAnalyzing
                   ? AppConstants.analysisScanning
-                  : (_analysisResults == null
+                  : (analysisResults == null
                         ? AppConstants.analysisReady
                         : AppConstants.analysisComplete),
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -287,7 +287,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
 
   Widget _buildAnalysisResults(BuildContext context) {
     final theme = Theme.of(context);
-    final results = _analysisResults!;
+    final results = analysisResults!;
     final confidence = results.confidence * 100;
 
     return Container(
@@ -430,10 +430,10 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           _buildModelDropdown(context),
           const SizedBox(height: 16),
           AdaptiveButton(
-            text: _analysisResults == null ? 'Analyze Scan' : 'Re-Analyze',
+            text: analysisResults == null ? 'Analyze Scan' : 'Re-Analyze',
             onPressed: _analyzeImage,
             icon: Icons.biotech_rounded,
-            isLoading: _isAnalyzing,
+            isLoading: isAnalyzing,
             isPrimary: true,
             width: double.infinity,
           ),
@@ -469,12 +469,12 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   const SizedBox(width: 16),
                   Expanded(
                     child: AdaptiveButton(
-                      text: _analysisResults == null
+                      text: analysisResults == null
                           ? 'Process Scan'
                           : 'Re-Analyze',
                       onPressed: _analyzeImage,
                       icon: Icons.biotech_rounded,
-                      isLoading: _isAnalyzing,
+                      isLoading: isAnalyzing,
                       isPrimary: true,
                     ),
                   ),
@@ -500,7 +500,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: _selectedModel,
+          value: selectedModel,
           isExpanded: true,
           dropdownColor: isDark ? AppColors.surfaceDark : Colors.white,
           icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
@@ -508,16 +508,16 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
           ),
-          onChanged: _isAnalyzing
+          onChanged: isAnalyzing
               ? null
               : (String? newValue) {
                   if (newValue != null) {
                     setState(() {
-                      _selectedModel = newValue;
+                      selectedModel = newValue;
                     });
                   }
                 },
-          items: _availableModels.map<DropdownMenuItem<String>>((String value) {
+          items: availableModels.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text('Model: ${value.toUpperCase()}'),

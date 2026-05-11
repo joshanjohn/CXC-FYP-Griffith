@@ -3,8 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:developer' as dev;
 
 class AuthTokenService {
-  static final AuthTokenService _instance = AuthTokenService._internal();
-  factory AuthTokenService() => _instance;
+  static final AuthTokenService instance = AuthTokenService._internal();
+  factory AuthTokenService() => instance;
   AuthTokenService._internal();
 
   final storage = const FlutterSecureStorage();

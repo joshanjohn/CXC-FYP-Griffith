@@ -10,7 +10,7 @@ enum PermissionResult { granted, denied, permanentlyDenied }
 
 /// Service for handling image selection and camera capture
 class ImageDatasourceService {
-  final ImagePicker _picker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
   List<CameraDescription>? _cameras;
 
   /// Initialize cameras (call this on app startup for mobile platforms)
@@ -80,7 +80,7 @@ class ImageDatasourceService {
 
   Future<XFile?> pickImageFromGallery() async {
     try {
-      final XFile? image = await _picker.pickImage(
+      final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1920,
         maxHeight: 1920,
@@ -107,7 +107,7 @@ class ImageDatasourceService {
     }
 
     try {
-      final XFile? image = await _picker.pickImage(
+      final XFile? image = await picker.pickImage(
         source: ImageSource.camera,
         maxWidth: 1920,
         maxHeight: 1920,
