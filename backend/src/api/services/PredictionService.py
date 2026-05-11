@@ -4,6 +4,7 @@ import io
 from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile, HTTPException
 from src.constants.model_names import AVAILABLE_MODELS, DEFAULT
+from src.constants.model_info import MODEL_INFO
 from src.constants.constants import CLASS_NAMES
 from src.utils.image_utils import ImageUtils
 
@@ -41,6 +42,12 @@ class PredictionService:
         function to return a list of available model aliases.
         """
         return list(AVAILABLE_MODELS.keys())
+
+    def get_models_info(self):
+        """
+        function to return detailed model metadata for frontend docs.
+        """
+        return [MODEL_INFO[model_name] for model_name in AVAILABLE_MODELS.keys()]
     
 
     async def predict(self, file: UploadFile, model_name: str = None):
@@ -55,7 +62,7 @@ class PredictionService:
                 raise HTTPException(status_code=400, detail="Uploaded file is empty")
             pil_image = Image.open(io.BytesIO(contents))
             pil_image.load()
-            img_array = ImageUtils.preprocess_image(pil_image)
+            img_array = ImageUtils.preprocess_image_for_model(pil_image, model)
             
             prediction_probs = model.predict(img_array)[0]
             

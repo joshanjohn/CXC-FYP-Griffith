@@ -48,14 +48,6 @@ async def predict_xray(file: UploadFile = File(...)):
     result = await prediction_service.predict(file)
     return JSONResponse(result)
 
-@router.get("/models")
-async def get_models():
-    """
-    GET endpoint for returning list of available models.
-    """
-    models = prediction_service.get_available_models()
-    return JSONResponse({"models": models})
-
 @router.post("/predictv2")
 async def predict_xray_v2(
     file: UploadFile = File(...),

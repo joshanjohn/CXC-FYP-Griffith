@@ -21,9 +21,11 @@ if not firebase_admin._apps:
         print(f"Error initializing Firebase: {e}")
         firebase_admin.initialize_app() # Fallback
 
+from src.api.routers.ModelRoute import router as model_router
 from src.api.routers.PredictionRoute import router as prediction_router
 
 app = FastAPI()
+app.include_router(model_router)
 app.include_router(prediction_router)
 
 app.add_middleware(
