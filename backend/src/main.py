@@ -4,11 +4,9 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from src.constants.model_names import  CXC104
+from src.constants.constants import IMG_SIZE, CLASS_NAMES
 
 
-
-CLASS_NAMES = ['NORMAL', 'PNEUMONIA', 'TUBERCULOSIS', 'UNKNOWN']
-IMG_SIZE = (224, 224)
 
 
 @st.cache_resource
