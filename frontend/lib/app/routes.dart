@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/docs/models/model_info.dart';
 import 'package:frontend/features/docs/view/pages/model_info_detail_page.dart';
 import 'package:frontend/features/prediction/view/pages/image_preview_page.dart';
 import 'package:frontend/features/prediction/view/pages/permission_error_page.dart';
@@ -42,8 +43,14 @@ class AppRoutes {
     }
     if (settings.name != null && settings.name!.startsWith('$docsModelBase/')) {
       final modelName = settings.name!.substring('$docsModelBase/'.length);
+      final initialModelInfo = settings.arguments is ModelInfo
+          ? settings.arguments as ModelInfo
+          : null;
       return MaterialPageRoute(
-        builder: (context) => ModelInfoDetailPage(modelName: modelName),
+        builder: (context) => ModelInfoDetailPage(
+          modelName: modelName,
+          initialModelInfo: initialModelInfo,
+        ),
       );
     }
     return null;

@@ -85,7 +85,7 @@ class PredictionService {
 
   Future<List<String>> getAvailableModels() async {
     if (baseUrl.isEmpty) {
-      return ['default', 'cxc104']; // Fallback
+      return ['default', 'cxc105']; // Fallback
     }
     final uri = Uri.parse('$baseUrl/models');
 

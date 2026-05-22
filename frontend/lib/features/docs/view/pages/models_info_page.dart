@@ -37,6 +37,8 @@ class ModelsInfoPageState extends State<ModelsInfoPage> {
         }
 
         final models = snapshot.data ?? const <ModelInfo>[];
+        docsController.seedModels(models);
+
         if (models.isEmpty) {
           return const Center(child: Text('No model documentation available.'));
         }
@@ -60,6 +62,7 @@ class ModelsInfoPageState extends State<ModelsInfoPage> {
                   onTap: () => Navigator.pushNamed(
                     context,
                     '${AppRoutes.docsModelBase}/${modelInfo.name}',
+                    arguments: modelInfo,
                   ),
                 );
               },

@@ -9,9 +9,14 @@ import 'package:frontend/shared/responsive/responsive_helper.dart';
 import 'package:frontend/shared/widgets/persistent_top_nav.dart';
 
 class ModelInfoDetailPage extends StatefulWidget {
-  const ModelInfoDetailPage({super.key, required this.modelName});
+  const ModelInfoDetailPage({
+    super.key,
+    required this.modelName,
+    this.initialModelInfo,
+  });
 
   final String modelName;
+  final ModelInfo? initialModelInfo;
 
   @override
   State<ModelInfoDetailPage> createState() => ModelInfoDetailPageState();
@@ -21,10 +26,23 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
   final DocsController docsController = DocsController();
   late final Future<ModelInfo?> modelFuture;
 
+  void _handleBackNavigation() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+
+    navigator.pushReplacementNamed(AppRoutes.docs);
+  }
+
   @override
   void initState() {
     super.initState();
-    modelFuture = docsController.getModelInfoByName(widget.modelName);
+    modelFuture = docsController.getModelInfoByName(
+      widget.modelName,
+      fallback: widget.initialModelInfo,
+    );
   }
 
   @override
@@ -112,6 +130,12 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          TextButton.icon(
+                            onPressed: _handleBackNavigation,
+                            icon: const Icon(Icons.arrow_back_rounded),
+                            label: const Text('Back'),
+                          ),
+                          const SizedBox(height: 16),
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(24),

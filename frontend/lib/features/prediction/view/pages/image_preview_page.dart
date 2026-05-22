@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/app/routes.dart';
 import 'package:frontend/shared/responsive/responsive_helper.dart';
 import 'package:frontend/shared/widgets/adaptive_button.dart';
 import 'package:frontend/shared/widgets/image_display_widget.dart';
@@ -7,6 +8,7 @@ import 'package:frontend/core/constants/app_constants.dart';
 import 'package:frontend/features/prediction/controllers/prediction_controller.dart';
 import 'package:frontend/features/prediction/models/prediction_response_model.dart';
 import 'package:frontend/features/prediction/view/widgets/prediction_chart.dart';
+import 'package:frontend/shared/widgets/persistent_top_nav.dart';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
@@ -52,7 +54,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       setState(() {
         availableModels = models;
         if (!availableModels.contains(selectedModel)) {
-          selectedModel = availableModels.isNotEmpty ? availableModels.first : 'default';
+          selectedModel = availableModels.isNotEmpty
+              ? availableModels.first
+              : 'default';
         }
       });
     }
@@ -120,33 +124,59 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final isMobile = ResponsiveHelper.isMobile(context);
+    final showCameraItem = ResponsiveHelper.isPlatformMobile();
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppBar(
-              title: Text(
-                AppConstants.analysisTitle,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                  color: isDark ? Colors.white : AppColors.onSurfaceLight,
+      body: Column(
+        children: [
+          PersistentTopNav(
+            title: AppConstants.analysisTitle,
+            items: [
+              PersistentTopNavItem(
+                label: 'Home',
+                icon: Icons.home_rounded,
+                isActive: false,
+                onTap: () => Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.workspace,
                 ),
               ),
-              centerTitle: true,
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: isDark ? Colors.white : AppColors.onSurfaceLight,
-                  size: 20,
+              if (showCameraItem)
+                PersistentTopNavItem(
+                  label: 'Camera',
+                  icon: Icons.camera_alt_rounded,
+                  isActive: false,
+                  onTap: () => Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.workspace,
+                  ),
                 ),
-                onPressed: () => Navigator.pop(context),
+              PersistentTopNavItem(
+                label: 'Batch',
+                icon: Icons.layers_rounded,
+                isActive: false,
+                onTap: () =>
+                    Navigator.pushReplacementNamed(context, AppRoutes.batch),
               ),
-            ),
-            Expanded(
+              PersistentTopNavItem(
+                label: 'Docs',
+                icon: Icons.library_books_rounded,
+                isActive: false,
+                onTap: () =>
+                    Navigator.pushReplacementNamed(context, AppRoutes.docs),
+              ),
+              PersistentTopNavItem(
+                label: 'Profile',
+                icon: Icons.person_rounded,
+                isActive: false,
+                onTap: () =>
+                    Navigator.pushReplacementNamed(context, AppRoutes.profile),
+              ),
+            ],
+          ),
+          Expanded(
+            child: SafeArea(
+              top: false,
               child: SlideTransition(
                 position: slideAnimation,
                 child: Center(
@@ -156,72 +186,90 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                       constraints: const BoxConstraints(
                         maxWidth: AppConstants.maxContentWidth,
                       ),
-                      child: isMobile
-                          ? Column(
-                              children: [
-                                _buildImageCard(context, isDark, isMobile),
-                                const SizedBox(height: 32),
-                                if (isAnalyzing) ...[
-                                  const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                  const SizedBox(height: 32),
-                                ] else if (analysisResults != null) ...[
-                                  _buildAnalysisResults(context),
-                                  const SizedBox(height: 32),
-                                ],
-                                if (!isAnalyzing) _buildActionButtons(context),
-                                const SizedBox(height: 24),
-                                _buildModernStatusCard(context, theme, isDark),
-                              ],
-                            )
-                          : Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // image on the left
-                                Expanded(
-                                  flex: 3,
-                                  child: _buildImageCard(
-                                    context,
-                                    isDark,
-                                    isMobile,
-                                  ),
-                                ),
-                                const SizedBox(width: 48),
-                                // results & buttons on the right
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    children: [
-                                      if (isAnalyzing) ...[
-                                        const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                        const SizedBox(height: 32),
-                                      ] else if (analysisResults != null) ...[
-                                        _buildAnalysisResults(context),
-                                        const SizedBox(height: 32),
-                                      ],
-                                      if (!isAnalyzing)
-                                        _buildActionButtons(context),
-                                      const SizedBox(height: 24),
-                                      _buildModernStatusCard(
-                                        context,
-                                        theme,
-                                        isDark,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.arrow_back_rounded),
+                              label: const Text('Back'),
                             ),
+                          ),
+                          const SizedBox(height: 12),
+                          isMobile
+                              ? Column(
+                                  children: [
+                                    _buildImageCard(context, isDark, isMobile),
+                                    const SizedBox(height: 32),
+                                    if (isAnalyzing) ...[
+                                      const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                      const SizedBox(height: 32),
+                                    ] else if (analysisResults != null) ...[
+                                      _buildAnalysisResults(context),
+                                      const SizedBox(height: 32),
+                                    ],
+                                    if (!isAnalyzing)
+                                      _buildActionButtons(context),
+                                    const SizedBox(height: 24),
+                                    _buildModernStatusCard(
+                                      context,
+                                      theme,
+                                      isDark,
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: _buildImageCard(
+                                        context,
+                                        isDark,
+                                        isMobile,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 48),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        children: [
+                                          if (isAnalyzing) ...[
+                                            const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                            const SizedBox(height: 32),
+                                          ] else if (analysisResults !=
+                                              null) ...[
+                                            _buildAnalysisResults(context),
+                                            const SizedBox(height: 32),
+                                          ],
+                                          if (!isAnalyzing)
+                                            _buildActionButtons(context),
+                                          const SizedBox(height: 24),
+                                          _buildModernStatusCard(
+                                            context,
+                                            theme,
+                                            isDark,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -503,7 +551,10 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           value: selectedModel,
           isExpanded: true,
           dropdownColor: isDark ? AppColors.surfaceDark : Colors.white,
-          icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
+          icon: const Icon(
+            Icons.arrow_drop_down_rounded,
+            color: AppColors.primary,
+          ),
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,

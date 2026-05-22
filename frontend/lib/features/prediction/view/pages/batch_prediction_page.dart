@@ -205,20 +205,23 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
               const SizedBox(height: 24),
               Expanded(
                 child: isMobile
-                    ? Column(
-                        children: [
-                          _buildUploadArea(isDark, theme),
-                          const SizedBox(height: 16),
-                          if (selectedFiles.isNotEmpty)
-                            _buildControlPanel(theme),
-                          const SizedBox(height: 16),
-                          if (_aggregation.isNotEmpty)
-                            _buildAggregationStats(theme),
-                          const SizedBox(height: 24),
-                          Expanded(
-                            child: _buildResultsList(theme, isDark),
-                          ),
-                        ],
+                    ? SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildUploadArea(isDark, theme),
+                            const SizedBox(height: 16),
+                            if (selectedFiles.isNotEmpty)
+                              _buildControlPanel(theme),
+                            if (selectedFiles.isNotEmpty)
+                              const SizedBox(height: 16),
+                            if (_aggregation.isNotEmpty)
+                              _buildAggregationStats(theme),
+                            if (_aggregation.isNotEmpty)
+                              const SizedBox(height: 24),
+                            _buildResultsList(theme, isDark, shrinkWrap: true),
+                          ],
+                        ),
                       )
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,11 +316,16 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
     return BatchAggregationStats(aggregation: _aggregation);
   }
 
-  Widget _buildResultsList(ThemeData theme, bool isDark) {
+  Widget _buildResultsList(
+    ThemeData theme,
+    bool isDark, {
+    bool shrinkWrap = false,
+  }) {
     return BatchResultsList(
       results: results,
       isProcessing: isProcessing,
       isDark: isDark,
+      shrinkWrap: shrinkWrap,
     );
   }
 }

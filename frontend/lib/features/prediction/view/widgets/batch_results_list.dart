@@ -6,12 +6,16 @@ class BatchResultsList extends StatelessWidget {
   final List<PredictionResponseModel> results;
   final bool isProcessing;
   final bool isDark;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
 
   const BatchResultsList({
     super.key,
     required this.results,
     required this.isProcessing,
     required this.isDark,
+    this.shrinkWrap = false,
+    this.physics,
   });
 
   @override
@@ -39,16 +43,21 @@ class BatchResultsList extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          Expanded(
-            child: results.isEmpty
-                ? Center(
-                    child: Text(
-                      isProcessing ? 'Please wait...' : 'No results yet',
-                      style: theme.textTheme.bodyMedium,
+          if (shrinkWrap)
+            results.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Text(
+                        isProcessing ? 'Please wait...' : 'No results yet',
+                        style: theme.textTheme.bodyMedium,
+                      ),
                     ),
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
+                    shrinkWrap: true,
+                    physics: physics ?? const NeverScrollableScrollPhysics(),
                     itemCount: results.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
@@ -58,8 +67,30 @@ class BatchResultsList extends StatelessWidget {
                         displayIndex: results.length - index,
                       );
                     },
-                  ),
-          ),
+                  )
+          else
+            Expanded(
+              child: results.isEmpty
+                  ? Center(
+                      child: Text(
+                        isProcessing ? 'Please wait...' : 'No results yet',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      physics: physics,
+                      itemCount: results.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final result = results[index];
+                        return _BatchResultTile(
+                          result: result,
+                          displayIndex: results.length - index,
+                        );
+                      },
+                    ),
+            ),
         ],
       ),
     );

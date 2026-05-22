@@ -34,11 +34,13 @@ class ModelInfoImagePanel extends StatelessWidget {
           const SizedBox(height: 14),
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
-            child: AspectRatio(
-              aspectRatio: 16 / 10,
+            child: Container(
+              width: double.infinity,
+              color: AppColors.primary.withValues(alpha: 0.04),
               child: Image.asset(
                 assetPath,
-                fit: BoxFit.cover,
+                width: double.infinity,
+                fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => Container(
                   color: AppColors.primary.withValues(alpha: 0.08),
                   alignment: Alignment.center,
