@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/prediction/view/pages/dashboard_page.dart';
-import 'package:frontend/features/prediction/view/pages/batch_prediction_page.dart';
+import 'package:frontend/features/docs/models/model_info.dart';
+import 'package:frontend/features/docs/view/pages/model_info_detail_page.dart';
 import 'package:frontend/features/prediction/view/pages/image_preview_page.dart';
 import 'package:frontend/features/prediction/view/pages/permission_error_page.dart';
 import 'package:frontend/features/auth/view/pages/login_page.dart';
 import 'package:frontend/features/auth/view/pages/signup_page.dart';
-
 import 'package:frontend/shared/widgets/navigation_shell.dart';
+
 import 'package:frontend/shared/widgets/auth_wrapper.dart';
 
 class AppRoutes {
@@ -18,13 +18,18 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String batch = '/batch';
+  static const String docs = '/docs';
+  static const String docsModelBase = '/docs/model';
+  static const String profile = '/profile';
 
   static Map<String, WidgetBuilder> get routes => {
     shell: (context) => const AuthWrapper(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),
-    workspace: (context) => const DashboardPage(),
-    batch: (context) => const BatchPredictionPage(),
+    workspace: (context) => const MainShell(initialIndex: 0),
+    batch: (context) => const MainShell(initialIndex: 2),
+    docs: (context) => const MainShell(initialIndex: 3),
+    profile: (context) => const MainShell(initialIndex: 4),
     error: (context) =>
         const PermissionErrorPage(permissionName: '', description: ''),
   };
@@ -34,6 +39,18 @@ class AppRoutes {
       final source = settings.arguments;
       return MaterialPageRoute(
         builder: (context) => ImagePreviewPage(imageSource: source),
+      );
+    }
+    if (settings.name != null && settings.name!.startsWith('$docsModelBase/')) {
+      final modelName = settings.name!.substring('$docsModelBase/'.length);
+      final initialModelInfo = settings.arguments is ModelInfo
+          ? settings.arguments as ModelInfo
+          : null;
+      return MaterialPageRoute(
+        builder: (context) => ModelInfoDetailPage(
+          modelName: modelName,
+          initialModelInfo: initialModelInfo,
+        ),
       );
     }
     return null;

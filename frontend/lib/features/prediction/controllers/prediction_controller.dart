@@ -3,14 +3,14 @@ import '../services/prediction_service.dart' as api;
 import '../models/prediction_response_model.dart';
 
 class PredictionController {
-  final api.PredictionService _predictionService = api.PredictionService();
+  final api.PredictionService predictionService = api.PredictionService();
 
   Future<PredictionResponseModel> predictXRay(
     Uint8List imageBytes,
     String filename, {
     String? modelName,
   }) async {
-    return _predictionService.predictXRay(
+    return predictionService.predictXRay(
       imageBytes,
       filename,
       modelName: modelName,
@@ -19,10 +19,10 @@ class PredictionController {
 
   Future<List<String>> getAvailableModels() async {
     try {
-      return await _predictionService.getAvailableModels();
+      return await predictionService.getAvailableModels();
     } catch (e) {
       // Return a default list if fetching fails or handle as needed
-      return ['default', 'cxc104'];
+      return ['default', 'cxc105'];
     }
   }
 }

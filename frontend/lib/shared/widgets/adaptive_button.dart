@@ -30,25 +30,25 @@ class AdaptiveButton extends StatefulWidget {
 class _AdaptiveButtonState extends State<AdaptiveButton>
     with SingleTickerProviderStateMixin {
   bool _isHovered = false;
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+  late AnimationController controller;
+  late Animation<double> scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    controller = AnimationController(
       duration: AppConstants.fastAnimation,
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
+    scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.95,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -60,11 +60,11 @@ class _AdaptiveButtonState extends State<AdaptiveButton>
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTapDown: (_) => _controller.forward(),
-        onTapUp: (_) => _controller.reverse(),
-        onTapCancel: () => _controller.reverse(),
+        onTapDown: (_) => controller.forward(),
+        onTapUp: (_) => controller.reverse(),
+        onTapCancel: () => controller.reverse(),
         child: ScaleTransition(
-          scale: _scaleAnimation,
+          scale: scaleAnimation,
           child: AnimatedContainer(
             duration: AppConstants.fastAnimation,
             width: widget.width,
@@ -92,7 +92,9 @@ class _AdaptiveButtonState extends State<AdaptiveButton>
               boxShadow: [
                 BoxShadow(
                   color: widget.isPrimary
-                      ? AppColors.primary.withValues(alpha: _isHovered ? 0.4 : 0.2)
+                      ? AppColors.primary.withValues(
+                          alpha: _isHovered ? 0.4 : 0.2,
+                        )
                       : Colors.black.withValues(alpha: _isHovered ? 0.1 : 0.05),
                   blurRadius: _isHovered ? 20 : 12,
                   offset: Offset(0, _isHovered ? 8 : 4),

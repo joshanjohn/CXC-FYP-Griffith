@@ -22,14 +22,14 @@ class BatchPredictionPage extends StatefulWidget {
 class _BatchPredictionPageState extends State<BatchPredictionPage> {
   final PredictionService _predictionService = PredictionService();
 
-  List<PlatformFile> _selectedFiles = [];
-  bool _isProcessing = false;
-  String? _sessionId;
-  List<PredictionResponseModel> _results = [];
+  List<PlatformFile> selectedFiles = [];
+  bool isProcessing = false;
+  String? sessionId;
+  List<PredictionResponseModel> results = [];
   Map<String, int> _aggregation = {};
-  double _progress = 0;
-  bool _isComplete = false;
-  final List<String> _failedFiles = [];
+  double progress = 0;
+  bool isComplete = false;
+  final List<String> failedFiles = [];
 
   void _showMessage(String message, {Color? backgroundColor}) {
     if (!mounted) return;
@@ -72,35 +72,35 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
 
     if (result != null) {
       setState(() {
-        _selectedFiles = result.files;
-        _results = [];
+        selectedFiles = result.files;
+        results = [];
         _aggregation = {};
-        _progress = 0;
-        _isComplete = false;
-        _sessionId = null;
-        _failedFiles.clear();
+        progress = 0;
+        isComplete = false;
+        sessionId = null;
+        failedFiles.clear();
       });
     }
   }
 
   Future<void> _processBatch() async {
-    if (_selectedFiles.isEmpty || _isProcessing) return;
+    if (selectedFiles.isEmpty || isProcessing) return;
 
     setState(() {
-      _isProcessing = true;
-      _results = [];
+      isProcessing = true;
+      results = [];
       _aggregation = {};
-      _progress = 0;
-      _failedFiles.clear();
+      progress = 0;
+      failedFiles.clear();
     });
 
     try {
       // 1. Start Session
-      _sessionId = await _predictionService.startBatchSession();
+      sessionId = await _predictionService.startBatchSession();
 
       // 2. Process Files
-      for (int i = 0; i < _selectedFiles.length; i++) {
-        final file = _selectedFiles[i];
+      for (int i = 0; i < selectedFiles.length; i++) {
+        final file = selectedFiles[i];
 
         Uint8List bytes;
         if (kIsWeb) {
@@ -122,33 +122,33 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
 
         try {
           final result = await _predictionService.classifyBatchImage(
-            _sessionId!,
+            sessionId!,
             bytes,
             file.name,
           );
 
           setState(() {
-            _results.insert(0, result);
+            results.insert(0, result);
             _aggregation[result.prediction] =
                 (_aggregation[result.prediction] ?? 0) + 1;
-            _progress = (i + 1) / _selectedFiles.length;
+            progress = (i + 1) / selectedFiles.length;
           });
         } catch (e) {
           debugPrint('Error classifying ${file.name}: $e');
           if (!mounted) continue;
           setState(() {
-            _failedFiles.add(file.name);
-            _progress = (i + 1) / _selectedFiles.length;
+            failedFiles.add(file.name);
+            progress = (i + 1) / selectedFiles.length;
           });
         }
       }
 
       setState(() {
-        _isComplete = true;
+        isComplete = true;
       });
 
-      if (mounted && _failedFiles.isNotEmpty) {
-        final failureCount = _failedFiles.length;
+      if (mounted && failedFiles.isNotEmpty) {
+        final failureCount = failedFiles.length;
         final message = failureCount == 1
             ? '1 file could not be classified.'
             : '$failureCount files could not be classified.';
@@ -159,15 +159,15 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
     } finally {
       if (mounted) {
         setState(() {
-          _isProcessing = false;
+          isProcessing = false;
         });
       }
     }
   }
 
   Future<void> _downloadZip() async {
-    if (_sessionId == null) return;
-    final download = await _predictionService.downloadBatchZip(_sessionId!);
+    if (sessionId == null) return;
+    final download = await _predictionService.downloadBatchZip(sessionId!);
     final savedPath = await saveDownloadedFile(
       download.bytes,
       download.filename,
@@ -205,20 +205,23 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
               const SizedBox(height: 24),
               Expanded(
                 child: isMobile
-                    ? Column(
-                        children: [
-                          _buildUploadArea(isDark, theme),
-                          const SizedBox(height: 16),
-                          if (_selectedFiles.isNotEmpty)
-                            _buildControlPanel(theme),
-                          const SizedBox(height: 16),
-                          if (_aggregation.isNotEmpty)
-                            _buildAggregationStats(theme),
-                          const SizedBox(height: 24),
-                          Expanded(
-                            child: _buildResultsList(theme, isDark),
-                          ),
-                        ],
+                    ? SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildUploadArea(isDark, theme),
+                            const SizedBox(height: 16),
+                            if (selectedFiles.isNotEmpty)
+                              _buildControlPanel(theme),
+                            if (selectedFiles.isNotEmpty)
+                              const SizedBox(height: 16),
+                            if (_aggregation.isNotEmpty)
+                              _buildAggregationStats(theme),
+                            if (_aggregation.isNotEmpty)
+                              const SizedBox(height: 24),
+                            _buildResultsList(theme, isDark, shrinkWrap: true),
+                          ],
+                        ),
                       )
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +233,7 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
                               children: [
                                 _buildUploadArea(isDark, theme),
                                 const SizedBox(height: 24),
-                                if (_selectedFiles.isNotEmpty)
+                                if (selectedFiles.isNotEmpty)
                                   _buildControlPanel(theme),
                                 const SizedBox(height: 24),
                                 if (_aggregation.isNotEmpty)
@@ -291,19 +294,19 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
   Widget _buildUploadArea(bool isDark, ThemeData theme) {
     return BatchUploadArea(
       isDark: isDark,
-      isProcessing: _isProcessing,
-      selectedFileCount: _selectedFiles.length,
+      isProcessing: isProcessing,
+      selectedFileCount: selectedFiles.length,
       onTap: _handlePickFilesTap,
     );
   }
 
   Widget _buildControlPanel(ThemeData theme) {
     return BatchControlPanel(
-      isProcessing: _isProcessing,
-      isComplete: _isComplete,
-      progress: _progress,
-      totalFiles: _selectedFiles.length,
-      failedCount: _failedFiles.length,
+      isProcessing: isProcessing,
+      isComplete: isComplete,
+      progress: progress,
+      totalFiles: selectedFiles.length,
+      failedCount: failedFiles.length,
       onProcess: _processBatch,
       onDownload: _handleDownloadTap,
     );
@@ -313,11 +316,16 @@ class _BatchPredictionPageState extends State<BatchPredictionPage> {
     return BatchAggregationStats(aggregation: _aggregation);
   }
 
-  Widget _buildResultsList(ThemeData theme, bool isDark) {
+  Widget _buildResultsList(
+    ThemeData theme,
+    bool isDark, {
+    bool shrinkWrap = false,
+  }) {
     return BatchResultsList(
-      results: _results,
-      isProcessing: _isProcessing,
+      results: results,
+      isProcessing: isProcessing,
       isDark: isDark,
+      shrinkWrap: shrinkWrap,
     );
   }
 }

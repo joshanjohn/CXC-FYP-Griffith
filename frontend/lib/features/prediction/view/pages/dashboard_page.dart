@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/app/routes.dart';
 import 'package:frontend/features/prediction/services/image_data_service.dart';
 import 'package:frontend/app/themes/app_colors.dart';
 import 'package:frontend/core/constants/app_constants.dart';
@@ -16,38 +17,33 @@ class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key, this.startWithCamera = false});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<DashboardPage> createState() => DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  final ImageDatasourceService _imageService = ImageDatasourceService();
-  bool _isProcessing = false;
+class DashboardPageState extends State<DashboardPage> {
+  final ImageDatasourceService imageService = ImageDatasourceService();
+  bool isProcessing = false;
 
   @override
   void initState() {
     super.initState();
-    _imageService.initializeCameras();
-    if (widget.startWithCamera) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _handleImageSelection(fromCamera: true);
-      });
-    }
+    imageService.initializeCameras();
   }
 
-  Future<void> _handleImageSelection({
+  Future<void> handleImageSelection({
     required bool fromCamera,
     dynamic dropFile,
   }) async {
-    if (_isProcessing) return;
+    if (isProcessing) return;
 
-    setState(() => _isProcessing = true);
+    setState(() => isProcessing = true);
 
     try {
       dynamic result;
       if (dropFile != null) {
         result = dropFile;
       } else {
-        result = await _imageService.selectImage(fromCamera: fromCamera);
+        result = await imageService.selectImage(fromCamera: fromCamera);
       }
 
       if (result != null && mounted) {
@@ -108,7 +104,7 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isProcessing = false);
+        setState(() => isProcessing = false);
       }
     }
   }
@@ -186,7 +182,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
           ),
-          if (_isProcessing)
+          if (isProcessing)
             Container(
               color: Colors.black26,
               child: const Center(child: CircularProgressIndicator()),
@@ -275,6 +271,13 @@ class _DashboardPageState extends State<DashboardPage> {
         const SizedBox(height: 16),
         _buildSubtitleText(context, theme),
         _buildWarningText(context, theme),
+        const SizedBox(height: 20),
+        OutlinedButton.icon(
+          onPressed: () =>
+              Navigator.pushReplacementNamed(context, AppRoutes.docs),
+          icon: const Icon(Icons.library_books_outlined),
+          label: const Text('View Model Docs'),
+        ),
       ],
     );
   }
@@ -288,7 +291,16 @@ class _DashboardPageState extends State<DashboardPage> {
           subtitle: 'Select scan from gallery',
           icon: Icons.upload_file_rounded,
           color: AppColors.primary,
-          onTap: () => _handleImageSelection(fromCamera: false),
+          onTap: () => handleImageSelection(fromCamera: false),
+        ),
+        const SizedBox(height: 20),
+        _buildMobileCard(
+          context: context,
+          title: 'Model Docs',
+          subtitle: 'View available backend model details',
+          icon: Icons.library_books_outlined,
+          color: AppColors.primaryDark,
+          onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.docs),
         ),
         if (isDeviceMobile) ...[
           const SizedBox(height: 20),
@@ -298,7 +310,7 @@ class _DashboardPageState extends State<DashboardPage> {
             subtitle: 'Capture a live X-Ray scan',
             icon: Icons.camera_enhance_rounded,
             color: AppColors.primaryDark,
-            onTap: () => _handleImageSelection(fromCamera: true),
+            onTap: () => handleImageSelection(fromCamera: true),
           ),
         ],
       ],
@@ -309,7 +321,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return DragDropZone(
       onFilesDropped: (files) {
         if (files.isNotEmpty) {
-          _handleImageSelection(fromCamera: false, dropFile: files.first);
+          handleImageSelection(fromCamera: false, dropFile: files.first);
         }
       },
       child: Container(
@@ -355,9 +367,16 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 48),
             AdaptiveButton(
               text: 'Browse Files',
-              onPressed: () => _handleImageSelection(fromCamera: false),
+              onPressed: () => handleImageSelection(fromCamera: false),
               icon: Icons.add_rounded,
               width: 240,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, AppRoutes.docs),
+              icon: const Icon(Icons.library_books_outlined),
+              label: const Text('Open Model Docs'),
             ),
           ],
         ),
