@@ -4,8 +4,6 @@ A modern, multi-platform Flutter application for chest X-ray analysis that works
 
 
 
-## 🚀 Getting Started
-
 ### Prerequisites
 
 - Flutter SDK (3.9.2 or higher)
