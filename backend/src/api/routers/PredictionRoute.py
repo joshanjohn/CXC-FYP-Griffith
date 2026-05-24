@@ -78,36 +78,48 @@ async def start_batch():
         os.makedirs(os.path.join(session_dir, class_name), exist_ok=True)
     return JSONResponse({"session_id": session_id})
 
-@router.post("/batch/classify")
-async def classify_batch(
+@router.post("/predict/batch")
+async def predict_batch(
     session_id: str = Form(...),
-    file: UploadFile = File(...),
+    files: list[UploadFile] = File(...),
     model_name: str = Query(None)
 ):
     """
-    Classify a single image within a batch session and save it to the session directory.
+    Classify multiple images within a batch session using a single batched inference call.
     """
     session_dir = os.path.join(TEMP_BASE_DIR, session_id)
-    print("SESSION DIR = ", session_dir)
     if not os.path.exists(session_dir):
         raise HTTPException(status_code=404, detail="Session not found")
-    
-    # Save the file content for later reuse since predict() consumes the stream
-    contents = await file.read()
-    await file.seek(0)
-    
-    # Get prediction
-    result = await prediction_service.predict(file, model_name=model_name)
-    predicted_class = result["prediction"]
-    if predicted_class not in CLASS_NAMES:
-        predicted_class = "UNKNOWN"
-    
-    # Save the file to the corresponding class directory
-    file_path = os.path.join(session_dir, predicted_class, validate_filename(file.filename))
-    with open(file_path, "wb") as f:
-        f.write(contents)
-    
-    return JSONResponse(result)
+
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+
+    await prediction_service.get_model(model_name)
+
+    file_payloads: list[tuple[str | None, bytes]] = []
+    for file in files:
+        contents = await file.read()
+        file_payloads.append((file.filename, contents))
+
+    results = prediction_service.predict_batch_from_bytes(
+        file_payloads,
+        model_name=model_name,
+    )
+
+    for (original_filename, contents), result in zip(file_payloads, results):
+        predicted_class = result["prediction"]
+        if predicted_class not in CLASS_NAMES:
+            predicted_class = "UNKNOWN"
+
+        file_path = os.path.join(
+            session_dir,
+            predicted_class,
+            validate_filename(original_filename),
+        )
+        with open(file_path, "wb") as f:
+            f.write(contents)
+
+    return JSONResponse({"results": results})
 
 @router.get("/batch/download/{session_id}")
 async def download_batch(session_id: str, background_tasks: BackgroundTasks):

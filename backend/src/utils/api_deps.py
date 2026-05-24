@@ -1,11 +1,33 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import os
 from firebase_admin import auth
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from src.constants.variables import FIREBASE_PROJECT_ID
+from src.constants.variables import FIREBASE_CREDENTIALS_PATH, FIREBASE_PROJECT_ID
 
 security = HTTPBearer(auto_error=True)
+
+
+def firebaseAdminVerificationEnabled() -> bool:
+    """
+    Return True when a Firebase Admin credentials file is configured locally.
+    """
+    return bool(
+        FIREBASE_CREDENTIALS_PATH and os.path.exists(FIREBASE_CREDENTIALS_PATH)
+    )
+
+
+def verifyWithFirebaseAdmin(token: str):
+    return auth.verify_id_token(token)
+
+
+def verifyWithGooglePublicKeys(token: str):
+    return id_token.verify_firebase_token(
+        token,
+        google_requests.Request(),
+        audience=FIREBASE_PROJECT_ID,
+    )
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
@@ -13,35 +35,24 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     """
     token = credentials.credentials
     try:
-        # Try standard firebase_admin verification first
-        # This works best in GCP/Production environments
-        decoded_token = auth.verify_id_token(token)
-        return decoded_token
+        if firebaseAdminVerificationEnabled():
+            decodedToken = verifyWithFirebaseAdmin(token)
+        else:
+            decodedToken = verifyWithGooglePublicKeys(token)
+
+        return decodedToken
     except Exception as e:
-        print(f"DEBUG: firebase_admin verification failed: {e}")
-        
-        # Fallback to google.oauth2.id_token if ADC is missing (common in local dev)
-        # This verifies the token using Google's public keys without needing a service account.
-        if "default credentials" in str(e).lower() or "credentials" in str(e).lower():
-            try:
-                print("DEBUG: Attempting google-auth verification fallback...")
-                decoded_token = id_token.verify_firebase_token(
-                    token,
-                    google_requests.Request(),
-                    audience=FIREBASE_PROJECT_ID
-                )
-                print("DEBUG: verification successful!")
-                return decoded_token
-            except Exception as fallback_e:
-                print(f"DEBUG: Fallback verification also failed: {fallback_e}")
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f"Firebase token verification failed. Error: {fallback_e}",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-        
+        errorMessage = str(e)
+
+        if firebaseAdminVerificationEnabled():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid or expired Firebase token: {errorMessage}",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid or expired Firebase token: {str(e)}",
+            detail=f"Firebase token verification failed: {errorMessage}",
             headers={"WWW-Authenticate": "Bearer"},
         )

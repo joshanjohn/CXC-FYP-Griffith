@@ -37,6 +37,74 @@ class PredictionService:
             },
         )
 
+    def predict_batch_from_bytes(
+        self,
+        files: list[tuple[str | None, bytes]],
+        model_name: str = None,
+    ):
+        """
+        for multiple uploaded images in a single batched predict call.
+        """
+        resolved_model_name = self.resolve_model_alias(model_name)
+        preprocessing_unit = self.get_model_preprocessing_unit(resolved_model_name)
+        model = self.model_cache.get(resolved_model_name)
+
+        if model is None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Model '{resolved_model_name}' is not loaded",
+            )
+
+        try:
+            processed_images = []
+            filenames = []
+
+            for filename, contents in files:
+                if not contents:
+                    raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+                pil_image = Image.open(io.BytesIO(contents))
+                pil_image.load()
+                img_array = ImageUtils.preprocess_image_for_model(
+                    pil_image,
+                    model,
+                    preprocess_fn=preprocessing_unit["input_preprocess_fn"],
+                )
+                processed_images.append(img_array[0])
+                filenames.append(filename)
+
+            batch_array = np.stack(processed_images, axis=0)
+            prediction_probs_batch = model.predict(batch_array, verbose=0)
+
+            results = []
+            for index, prediction_probs in enumerate(prediction_probs_batch):
+                predicted_class_idx = int(np.argmax(prediction_probs))
+                predicted_class = CLASS_NAMES[predicted_class_idx]
+                confidence = float(prediction_probs[predicted_class_idx])
+                all_confidences = {
+                    CLASS_NAMES[i]: float(prediction_probs[i])
+                    for i in range(len(CLASS_NAMES))
+                }
+
+                results.append(
+                    {
+                        "prediction": predicted_class,
+                        "confidence": confidence,
+                        "all_confidences": all_confidences,
+                        "model_used": resolved_model_name,
+                        "filename": filenames[index],
+                    }
+                )
+
+            return results
+        except HTTPException:
+            raise
+        except UnidentifiedImageError:
+            raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
+        except Exception as e:
+            print(f"Batch prediction error: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
     async def get_model(self, model_alias: str = None):
         """
         return a model using its alias or model name. If no alias is provided, it use the default model (DEFAULT).
