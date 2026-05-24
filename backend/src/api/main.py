@@ -1,17 +1,16 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import tensorflow as tf
 from fastapi import Request
-import numpy as np
-from PIL import Image
-import io
 import uvicorn
 
 import firebase_admin
-from firebase_admin import credentials
 
 from src.constants.variables import FIREBASE_PROJECT_ID
+from src.constants.variables import PORT
+from src.api.routers.ModelRoute import router as model_router
+from src.api.routers.PredictionRoute import router as prediction_router
+
+
 # Initialize Firebase Admin
 if not firebase_admin._apps:
     try:
@@ -21,8 +20,6 @@ if not firebase_admin._apps:
         print(f"Error initializing Firebase: {e}")
         firebase_admin.initialize_app() # Fallback
 
-from src.api.routers.ModelRoute import router as model_router
-from src.api.routers.PredictionRoute import router as prediction_router
 
 app = FastAPI()
 app.include_router(model_router)
@@ -44,7 +41,6 @@ async def root(request: Request) -> dict[str, str]:
 async def health(request: Request) -> dict[str, str]: 
     return {"status": "healthy"}
 
-from src.constants.variables import PORT
 
 if __name__ == "__main__":
     uvicorn.run("src.api.main:app", host="0.0.0.0", port=int(PORT) if PORT else 8080, reload=True)

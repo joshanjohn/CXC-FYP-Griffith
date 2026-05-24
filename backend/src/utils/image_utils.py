@@ -19,7 +19,11 @@ class ImageUtils:
         return int(height), int(width)
 
     @staticmethod
-    def preprocess_image(pil_image: Image.Image, target_size=IMG_SIZE):
+    def preprocess_image(
+        pil_image: Image.Image,
+        target_size=IMG_SIZE,
+        preprocess_fn=None,
+    ):
         """
         Preprocess the image for model prediction.
         """
@@ -29,13 +33,20 @@ class ImageUtils:
         img = pil_image.resize(target_size)
         img_array = tf.keras.preprocessing.image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
+
+        if preprocess_fn is not None:
+            img_array = preprocess_fn(img_array)
         
         return img_array
 
     @staticmethod
-    def preprocess_image_for_model(pil_image: Image.Image, model):
+    def preprocess_image_for_model(pil_image: Image.Image, model, preprocess_fn=None):
         """
         Preprocess the image using the input size expected by the provided model.
         """
         target_size = ImageUtils.get_target_size_for_model(model)
-        return ImageUtils.preprocess_image(pil_image, target_size=target_size)
+        return ImageUtils.preprocess_image(
+            pil_image,
+            target_size=target_size,
+            preprocess_fn=preprocess_fn,
+        )

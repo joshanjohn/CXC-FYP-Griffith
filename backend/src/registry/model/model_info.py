@@ -1,5 +1,5 @@
 MODEL_INFO = {
-    "cxc1": {
+    "cxc101": {
         "name": "CXC 101",
         "description": "CXC 101 is the first version of Chest Xray Classifier CNN model. It uses 3 block of convolutional with  32, 64, and 128 filters.",
         "model_accuracy": 83.30,
@@ -29,8 +29,8 @@ MODEL_INFO = {
         "val_confusion_img": "assets/images/models/cxc103.png",
         "val_roc_img": "assets/images/models/cxc103.png",
     },
-    "cxc104": {
-        "name": "cxc104",
+    "cxc201": {
+        "name": "cxc201",
         "description": "Production-ready classification candidate optimized for reliable inference in the application workflow.",
         "model_accuracy": 0.94,
         "val_accuracy": 0.92,
@@ -39,8 +39,8 @@ MODEL_INFO = {
         "val_confusion_img": "assets/images/models/cxc104.png",
         "val_roc_img": "assets/images/models/cxc104.png",
     },
-    "cxc105": {
-        "name": "cxc105",
+    "cxc202": {
+        "name": "cxc202",
         "description": "Latest high-performing chest X-ray model currently used as the default backend inference model.",
         "model_accuracy": 0.95,
         "val_accuracy": 0.93,
@@ -49,14 +49,5 @@ MODEL_INFO = {
         "val_confusion_img": "assets/images/models/cxc105.png",
         "val_roc_img": "assets/images/models/cxc105.png",
     },
-    "default": {
-        "name": "default",
-        "description": "Default deployed alias that currently resolves to the primary production chest X-ray model.",
-        "model_accuracy": 0.95,
-        "val_accuracy": 0.93,
-        "test_confusion_img": "assets/images/models/default.png",
-        "test_roc_img": "assets/images/models/default.png",
-        "val_confusion_img": "assets/images/models/default.png",
-        "val_roc_img": "assets/images/models/default.png",
-    },
 }
+
