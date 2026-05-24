@@ -43,4 +43,7 @@ class AppConstants {
   static const String analysisScanning = 'AI is scanning the X-Ray...';
   static const String analysisReady =
       'Ready for processing. Tap analyze to begin.';
+
+  // Batch prediction
+  static const int batchChunkSize = 30;
 }

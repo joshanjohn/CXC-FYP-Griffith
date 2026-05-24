@@ -15,6 +15,13 @@ class BatchZipDownload {
   final String filename;
 }
 
+class BatchImageInput {
+  const BatchImageInput({required this.bytes, required this.filename});
+
+  final Uint8List bytes;
+  final String filename;
+}
+
 class PredictionService {
   final String baseUrl = resolveBackendUrl(beUri, mobileUrl: beUriMobile);
 
@@ -85,7 +92,7 @@ class PredictionService {
 
   Future<List<String>> getAvailableModels() async {
     if (baseUrl.isEmpty) {
-      return ['default', 'cxc105']; // Fallback
+      return ['cxc201'];
     }
     final uri = Uri.parse('$baseUrl/models');
 
@@ -95,7 +102,12 @@ class PredictionService {
 
       if (response.statusCode == 200) {
         final decodedData = json.decode(response.body);
-        return List<String>.from(decodedData['models']);
+        final models = List<String>.from(decodedData['models']);
+        final filteredModels = models
+            .where((model) => model.toLowerCase() != 'default')
+            .toList();
+
+        return filteredModels.isNotEmpty ? filteredModels : ['cxc201'];
       } else if (response.statusCode == 401) {
         await FirebaseAuth.instance.signOut();
         throw Exception('Session expired. Please log in again.');
@@ -131,16 +143,19 @@ class PredictionService {
     }
   }
 
-  Future<PredictionResponseModel> classifyBatchImage(
+  Future<List<PredictionResponseModel>> predictBatchImages(
     String sessionId,
-    Uint8List imageBytes,
-    String filename, {
+    List<BatchImageInput> files, {
     String? modelName,
   }) async {
     if (baseUrl.isEmpty) {
       throw Exception('Backend URL is not configured.');
     }
-    final uri = Uri.parse('$baseUrl/batch/classify').replace(
+    if (files.isEmpty) {
+      return const <PredictionResponseModel>[];
+    }
+
+    final uri = Uri.parse('$baseUrl/predict/batch').replace(
       queryParameters: modelName != null && modelName.toLowerCase() != 'default'
           ? {'model_name': modelName}
           : null,
@@ -150,25 +165,36 @@ class PredictionService {
     final headers = await getHeaders();
     request.headers.addAll(headers);
     request.fields['session_id'] = sessionId;
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        imageBytes,
-        filename: filename,
-        contentType: contentTypeForFilename(filename),
-      ),
-    );
+
+    for (final file in files) {
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'files',
+          file.bytes,
+          filename: file.filename,
+          contentType: contentTypeForFilename(file.filename),
+        ),
+      );
+    }
 
     try {
       final response = await request.send();
       final responseData = await response.stream.bytesToString();
       if (response.statusCode == 200) {
-        return PredictionResponseModel.fromJson(json.decode(responseData));
+        final decoded = json.decode(responseData) as Map<String, dynamic>;
+        final results = decoded['results'] as List<dynamic>;
+        return results
+            .map(
+              (item) => PredictionResponseModel.fromJson(
+                item as Map<String, dynamic>,
+              ),
+            )
+            .toList();
       } else if (response.statusCode == 401) {
         await FirebaseAuth.instance.signOut();
         throw Exception('Session expired. Please log in again.');
       } else {
-        throw Exception('Failed to classify batch image: $responseData');
+        throw Exception('Failed to predict batch images: $responseData');
       }
     } catch (e) {
       throw Exception('Network error: $e');

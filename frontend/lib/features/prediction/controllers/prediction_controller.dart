@@ -21,8 +21,7 @@ class PredictionController {
     try {
       return await predictionService.getAvailableModels();
     } catch (e) {
-      // Return a default list if fetching fails or handle as needed
-      return ['default', 'cxc105'];
+      return ['cxc201'];
     }
   }
 }
