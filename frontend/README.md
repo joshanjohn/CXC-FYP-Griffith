@@ -12,7 +12,7 @@
 - Configure .env 
 
 
-### Run Application 
+### Run Application 
 ````
 flutter run 
 ````
