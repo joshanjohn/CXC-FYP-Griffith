@@ -200,7 +200,7 @@ class DashboardPageState extends State<DashboardPage> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        'CXC1',
+        'CXC',
         style: theme.textTheme.labelMedium?.copyWith(
           color: Colors.white,
           fontWeight: FontWeight.w800,

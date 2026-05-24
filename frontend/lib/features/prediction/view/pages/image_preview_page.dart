@@ -30,8 +30,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   late AnimationController slideController;
   late Animation<Offset> slideAnimation;
 
-  String selectedModel = 'default';
-  List<String> availableModels = ['default'];
+  String selectedModel = 'cxc201';
+  List<String> availableModels = const ['cxc201'];
 
   @override
   void initState() {
@@ -52,11 +52,13 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
     final models = await predictionController.getAvailableModels();
     if (mounted) {
       setState(() {
-        availableModels = models;
+        availableModels = models
+            .where((model) => model.toLowerCase() != 'default')
+            .toList();
         if (!availableModels.contains(selectedModel)) {
           selectedModel = availableModels.isNotEmpty
               ? availableModels.first
-              : 'default';
+              : 'cxc201';
         }
       });
     }
@@ -538,6 +540,9 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   Widget _buildModelDropdown(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final defaultModel = availableModels.isNotEmpty
+        ? availableModels.first
+        : null;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -569,9 +574,14 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   }
                 },
           items: availableModels.map<DropdownMenuItem<String>>((String value) {
+            final isDefaultModel = value == defaultModel;
             return DropdownMenuItem<String>(
               value: value,
-              child: Text('Model: ${value.toUpperCase()}'),
+              child: Text(
+                isDefaultModel
+                    ? 'Model: ${value.toUpperCase()} (Default)'
+                    : 'Model: ${value.toUpperCase()}',
+              ),
             );
           }).toList(),
         ),
