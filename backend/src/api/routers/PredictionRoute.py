@@ -8,9 +8,11 @@ import shutil
 import tempfile
 from pathlib import Path
 from src.constants.constants import CLASS_NAMES
+from src.logging import get_logger
 
 TEMP_BASE_DIR = os.path.join(tempfile.gettempdir(), "cxc_batch")
 os.makedirs(TEMP_BASE_DIR, exist_ok=True)
+logger = get_logger(__name__)
 
 router = APIRouter(
     tags=["prediction"],
@@ -40,26 +42,17 @@ def validate_filename(filename: str | None) -> str:
     return f"{sanitized_stem[:80]}_{uuid.uuid4().hex[:8]}{suffix.lower()}"
 
 @router.post("/predict")
-async def predict_xray(file: UploadFile = File(...)):
-    """
-    POST endpoint for prediting with default model. 
-    only file need to be passed. 
-    """
-    result = await prediction_service.predict(file)
-    return JSONResponse(result)
-
-@router.post("/predictv2")
-async def predict_xray_v2(
+async def predict_xray(
     file: UploadFile = File(...),
     model_name: str = Query(..., description="The name of the model to use for prediction")
 ):
     """
-    POST endpoint for prediction need to provide: 
+    POST endpoint for prediction need to provide:
     a file and a valid model name as argument.
     """
     if not model_name:
         raise HTTPException(status_code=400, detail="model_name parameter is required")
-        
+
     result = await prediction_service.predict(file, model_name=model_name)
     return JSONResponse(result)
 
@@ -70,7 +63,7 @@ async def start_batch():
     return session id 
     """
     session_id = str(uuid.uuid4())  # session id for batch process 
-    print("SESSION ID = ", session_id)
+    logger.info(f"Created batch session {session_id}")
     session_dir = os.path.join(TEMP_BASE_DIR, session_id) # temp dir to store 
     os.makedirs(session_dir, exist_ok=True)
 

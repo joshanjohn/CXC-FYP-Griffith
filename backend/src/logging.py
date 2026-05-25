@@ -1,14 +1,13 @@
 """
 Author : Joshan John
 Student Number : 3092883
-Email: joshanjohn2003@mail.com
-Project : https://github.com/joshanjohn/jcloud-pass.git
 """
-
+    
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from enum import StrEnum
+from src.constants.constants import APP_LOG_LEVEL, APP_LOGGER_NAME
 
 
 # --- Constants ---
@@ -24,7 +23,7 @@ class LogLevels(StrEnum):
     debug = "DEBUG"
 
 
-def configure_logging(log_level: str = LogLevels.info): 
+def configure_logging(log_level: str = APP_LOG_LEVEL):
     """
     Configures robust logging with both Console and Rotating File output.
     Creates a .logs directory at the project root.
@@ -66,5 +65,14 @@ def configure_logging(log_level: str = LogLevels.info):
     root_logger.addHandler(file_handler)
 
     # Log initial configuration
-    logging.info(f"Logging initialized at level {log_level}. Logs saved to {file_path}")
+    logging.getLogger(APP_LOGGER_NAME).info(
+        "Logging initialized at level %s. Logs saved to %s",
+        log_level,
+        file_path,
+    )
     return logging
+
+
+def get_logger(name: str | None = None):
+    logger_name = f"{APP_LOGGER_NAME}.{name}" if name else APP_LOGGER_NAME
+    return logging.getLogger(logger_name)

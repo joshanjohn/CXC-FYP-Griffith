@@ -7,10 +7,14 @@ from src.constants.constants import CLASS_NAMES
 from src.registry.model.model_info import MODEL_INFO
 from src.registry.model.model_names import AVAILABLE_MODELS, DEFAULT, DEFAULT_MODEL_ALIAS
 from src.registry.model.model_preprocessing import MODEL_PREPROCESSING_UNITS
+from src.logging import get_logger
 from src.utils.image_utils import ImageUtils
+
+logger = get_logger(__name__)
 
 class PredictionService:
     def __init__(self):
+        # cached model variable 
         self.model_cache = {}
 
     def resolve_model_alias(self, model_alias: str = None) -> str:
@@ -46,6 +50,9 @@ class PredictionService:
         for multiple uploaded images in a single batched predict call.
         """
         resolved_model_name = self.resolve_model_alias(model_name)
+        logger.info(
+           f"Running batch prediction with model {resolved_model_name} for {len(files)} files.",
+        )
         preprocessing_unit = self.get_model_preprocessing_unit(resolved_model_name)
         model = self.model_cache.get(resolved_model_name)
 
@@ -96,13 +103,17 @@ class PredictionService:
                     }
                 )
 
+
+                logger.info(f"Prediction completed with model {resolved_model_name}: \nclass={predicted_class} confidence={confidence} filename={filenames[index]}",)
+
+
             return results
         except HTTPException:
             raise
         except UnidentifiedImageError:
             raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
         except Exception as e:
-            print(f"Batch prediction error: {e}")
+            logger.exception("Batch prediction error: %s", e)
             raise HTTPException(status_code=500, detail=str(e))
 
     async def get_model(self, model_alias: str = None):
@@ -115,13 +126,13 @@ class PredictionService:
 
         if model_key not in self.model_cache:
             try:
-                print(f"Loading model {model_key} from {model_path}...")
+                logger.info(f"Loading model {model_key} from {model_path}")
                 self.model_cache[model_key] = tf.keras.models.load_model(
                     model_path,
                     custom_objects=preprocessing_unit["custom_objects"],
                 )
             except Exception as e:
-                print(f"Error loading model {model_key}: {e}")
+                logger.exception(f"Error loading model {model_key}: {e}")
                 raise HTTPException(status_code=500, detail=f"Failed to load model {model_key}")
 
         return self.model_cache[model_key]
@@ -155,7 +166,7 @@ class PredictionService:
                 }
             )
 
-        print(models_info)
+        logger.debug(f"Resolved {len(models_info)} model info entries")
         return models_info
     
 
@@ -188,8 +199,8 @@ class PredictionService:
 
             # Create a dictionary of all class confidences
             all_confidences = {CLASS_NAMES[i]: float(prediction_probs[i]) for i in range(len(CLASS_NAMES))}
-            
-            print(f"Model: {model_name or 'default'}, Prediction: {predicted_class}, Confidence: {confidence}")
+
+            logger.info(f"Prediction completed with model {resolved_model_name}: \nclass={predicted_class} confidence={confidence} filename={file.filename}",)
 
             return {
                 "prediction": predicted_class,
@@ -203,5 +214,5 @@ class PredictionService:
         except UnidentifiedImageError:
             raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
         except Exception as e:
-            print(f"Prediction error: {e}")
+            logger.exception(f"Prediction error: {e}")
             raise HTTPException(status_code=500, detail=str(e))
