@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/features/auth/controllers/auth_controller.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
-import 'package:frontend/shared/widgets/adaptive_button.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/features/auth/controllers/auth_controller.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
+import 'package:cxc/shared/widgets/adaptive_button.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants/app_constants.dart';
+import 'package:cxc/core/constants/app_constants.dart';
 
 class DashboardCard extends StatefulWidget {
   final String title;
   final String subtitle;
+  final String actionLabel;
   final List<String> features;
   final IconData icon;
   final Color themeColor;
@@ -13,6 +14,7 @@ class DashboardCard extends StatefulWidget {
     super.key,
     required this.title,
     required this.subtitle,
+    required this.actionLabel,
     required this.features,
     required this.icon,
     required this.themeColor,
@@ -48,7 +50,9 @@ class _DashboardCardState extends State<DashboardCard>
                 : widget.themeColor.withValues(alpha: _isHovered ? 0.04 : 0.02),
             borderRadius: BorderRadius.circular(AppConstants.radiusExtraLarge),
             border: Border.all(
-              color: widget.themeColor.withValues(alpha: _isHovered ? 0.6 : 0.3),
+              color: widget.themeColor.withValues(
+                alpha: _isHovered ? 0.6 : 0.3,
+              ),
               width: 1.5,
             ),
             boxShadow: [
@@ -110,7 +114,9 @@ class _DashboardCardState extends State<DashboardCard>
                           feature,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.8,
+                            ),
                           ),
                         ),
                       ),
@@ -126,13 +132,15 @@ class _DashboardCardState extends State<DashboardCard>
                 decoration: BoxDecoration(
                   color: widget.themeColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: widget.themeColor.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: widget.themeColor.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'upload',
+                      widget.actionLabel,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,

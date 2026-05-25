@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/docs/view/pages/models_info_page.dart';
-import 'package:frontend/features/auth/view/pages/profile_page.dart';
-import 'package:frontend/features/prediction/view/pages/batch_prediction_page.dart';
-import 'package:frontend/features/prediction/view/pages/dashboard_page.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
-import 'package:frontend/shared/widgets/persistent_top_nav.dart';
+import 'package:cxc/features/docs/view/pages/models_info_page.dart';
+import 'package:cxc/features/auth/view/pages/profile_page.dart';
+import 'package:cxc/features/prediction/view/pages/batch_prediction_page.dart';
+import 'package:cxc/features/prediction/view/pages/dashboard_page.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
+import 'package:cxc/shared/widgets/persistent_top_nav.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key, this.initialIndex = 0});

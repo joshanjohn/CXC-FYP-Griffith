@@ -3,40 +3,90 @@ import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
 
-// Saves a downloaded file to the device and returns the file path
 Future<String?> saveDownloadedFile(Uint8List bytes, String filename) async {
-  // Try to save in Downloads, fallback to temp if not available
-  final directory =
-      await getDownloadsDirectory() ?? await getTemporaryDirectory();
+  final candidateDirectories = await resolveDownloadDirectories();
 
-  // Build a unique file path so we don’t overwrite existing files
-  final filePath = _buildUniquePath(directory.path, filename);
-  final file = File(filePath);
+  Object? lastError;
+  for (final directory in candidateDirectories) {
+    try {
+      await directory.create(recursive: true);
+      final filePath = buildUniquePath(directory.path, filename);
+      final file = File(filePath);
+      await file.writeAsBytes(bytes, flush: true);
+      return file.path;
+    } catch (error) {
+      lastError = error;
+    }
+  }
 
-  // Write the file to disk
-  await file.writeAsBytes(bytes, flush: true);
+  if (lastError != null) {
+    throw Exception('Unable to save downloaded file: $lastError');
+  }
 
-  return file.path;
+  throw Exception('Unable to save downloaded file.');
 }
 
-// Creates a unique file path by adding a counter if file already exists
-String _buildUniquePath(String directoryPath, String filename) {
-  final separator = Platform.pathSeparator;
+Future<List<Directory>> resolveDownloadDirectories() async {
+  if (Platform.isAndroid) {
+    final directories = <Directory>[
+      Directory('/storage/emulated/0/Download'),
+      Directory('/sdcard/Download'),
+    ];
 
-  // Use a default name if filename is empty
+    final downloadsDirectory = await getDownloadsDirectory();
+    if (downloadsDirectory != null) {
+      directories.add(downloadsDirectory);
+    }
+
+    final externalDirectory = await getExternalStorageDirectory();
+    if (externalDirectory != null) {
+      directories.add(
+        Directory(
+          '${externalDirectory.path}${Platform.pathSeparator}Downloads',
+        ),
+      );
+      directories.add(externalDirectory);
+    }
+
+    directories.add(await getApplicationDocumentsDirectory());
+    directories.add(await getTemporaryDirectory());
+    return uniqueDirectories(directories);
+  }
+
+  if (Platform.isIOS) {
+    return uniqueDirectories([
+      await getApplicationDocumentsDirectory(),
+      await getApplicationSupportDirectory(),
+      await getTemporaryDirectory(),
+    ]);
+  }
+
+  if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+    final directories = <Directory>[];
+    final downloadsDirectory = await getDownloadsDirectory();
+    if (downloadsDirectory != null) {
+      directories.add(downloadsDirectory);
+    }
+
+    directories.add(await getApplicationDocumentsDirectory());
+    directories.add(await getTemporaryDirectory());
+    return uniqueDirectories(directories);
+  }
+
+  return [await getTemporaryDirectory()];
+}
+
+String buildUniquePath(String directoryPath, String filename) {
+  final separator = Platform.pathSeparator;
   final safeFilename = filename.trim().isEmpty
       ? 'classified_images.zip'
-      : filename;
-
-  // Split filename into name and extension
+      : sanitizeFilename(filename);
   final dotIndex = safeFilename.lastIndexOf('.');
   final hasExtension = dotIndex > 0 && dotIndex < safeFilename.length - 1;
   final name = hasExtension
       ? safeFilename.substring(0, dotIndex)
       : safeFilename;
   final extension = hasExtension ? safeFilename.substring(dotIndex) : '';
-
-  // Start with original filename
   var candidate = '$directoryPath$separator$safeFilename';
   var counter = 1;
 
@@ -46,4 +96,30 @@ String _buildUniquePath(String directoryPath, String filename) {
   }
 
   return candidate;
+}
+
+String sanitizeFilename(String filename) {
+  final trimmedFilename = filename.trim();
+  if (trimmedFilename.isEmpty) {
+    return 'classified_images.zip';
+  }
+
+  final invalidCharacters = RegExp(r'[<>:"/\\|?*\x00-\x1F]');
+  final sanitizedFilename = trimmedFilename.replaceAll(invalidCharacters, '_');
+  return sanitizedFilename.isEmpty
+      ? 'classified_images.zip'
+      : sanitizedFilename;
+}
+
+List<Directory> uniqueDirectories(List<Directory> directories) {
+  final seenPaths = <String>{};
+  final uniqueList = <Directory>[];
+
+  for (final directory in directories) {
+    if (seenPaths.add(directory.path)) {
+      uniqueList.add(directory);
+    }
+  }
+
+  return uniqueList;
 }

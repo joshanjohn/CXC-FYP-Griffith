@@ -40,7 +40,6 @@ class ImageDatasourceService {
       return _mapStatusToResult(status);
     } else {
       if (Platform.isAndroid) {
-
         // Try requesting photos first
         var status = await Permission.photos.request();
 
@@ -127,17 +126,13 @@ class ImageDatasourceService {
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png'],
         allowMultiple: false,
-        withData: kIsWeb, // Crucial for Web to get bytes
+        withData: kIsWeb || (!kIsWeb && Platform.isMacOS),
       );
 
       if (result != null) {
-        if (kIsWeb) {
+        if (result.files.single.bytes != null) {
           final bytes = result.files.single.bytes;
-          if (bytes == null) {
-            debugPrint('Error: No bytes available for picked file on Web');
-            return null;
-          }
-          return bytes; // Returns Uint8List
+          return bytes;
         }
         return result.files.single.path; // Returns String (path)
       }

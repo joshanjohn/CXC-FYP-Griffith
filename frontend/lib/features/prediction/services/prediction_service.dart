@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:frontend/core/constants/app_variables.dart';
-import 'package:frontend/core/services/auth_token_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:frontend/core/utils/platform_url.dart';
-import 'package:frontend/features/prediction/models/prediction_response_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cxc/core/constants/app_variables.dart';
+import 'package:cxc/core/services/auth_token_service.dart';
+import 'package:cxc/features/prediction/models/prediction_response_model.dart';
+import 'package:cxc/core/utils/platform_url.dart';
 
 class BatchZipDownload {
   const BatchZipDownload({required this.bytes, required this.filename});
@@ -47,15 +47,13 @@ class PredictionService {
     if (baseUrl.isEmpty) {
       throw Exception('Backend URL is not configurederror');
     }
-
-    final bool isDefault =
-        modelName == null || modelName.toLowerCase() == 'default';
-    final String endpoint = isDefault ? '/predict' : '/predictv2';
-    final queryParams = isDefault ? null : {'model_name': modelName};
+    if (modelName == null || modelName.trim().isEmpty) {
+      throw Exception('A model name is required for prediction.');
+    }
 
     final uri = Uri.parse(
-      '$baseUrl$endpoint',
-    ).replace(queryParameters: queryParams);
+      '$baseUrl/predict',
+    ).replace(queryParameters: {'model_name': modelName});
 
     final request = http.MultipartRequest('POST', uri);
     final headers = await getHeaders();

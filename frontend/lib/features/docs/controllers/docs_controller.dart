@@ -1,5 +1,5 @@
-import 'package:frontend/features/docs/models/model_info.dart';
-import 'package:frontend/features/docs/services/docs_service.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
+import 'package:cxc/features/docs/services/docs_service.dart';
 
 class DocsController {
   DocsController._();

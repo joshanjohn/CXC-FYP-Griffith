@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:frontend/core/constants/app_variables.dart';
-import 'package:frontend/core/services/auth_token_service.dart';
-import 'package:frontend/core/utils/platform_url.dart';
-import 'package:frontend/features/docs/models/model_info.dart';
+import 'package:cxc/core/constants/app_variables.dart';
+import 'package:cxc/core/services/auth_token_service.dart';
+import 'package:cxc/core/utils/platform_url.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
 import 'package:http/http.dart' as http;
 
 class DocsService {

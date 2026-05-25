@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
 
 class PersistentTopNavItem {
   const PersistentTopNavItem({

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/routes.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/features/docs/controllers/docs_controller.dart';
-import 'package:frontend/features/docs/models/model_info.dart';
-import 'package:frontend/features/docs/view/widgets/model_info_image_panel.dart';
-import 'package:frontend/features/docs/view/widgets/model_info_stat_card.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
-import 'package:frontend/shared/widgets/persistent_top_nav.dart';
+import 'package:cxc/app/routes.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/features/docs/controllers/docs_controller.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
+import 'package:cxc/features/docs/view/widgets/model_info_image_panel.dart';
+import 'package:cxc/features/docs/view/widgets/model_info_stat_card.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
+import 'package:cxc/shared/widgets/persistent_top_nav.dart';
 
 class ModelInfoDetailPage extends StatefulWidget {
   const ModelInfoDetailPage({

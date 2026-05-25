@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/app/routes.dart';
-import 'package:frontend/features/prediction/services/image_data_service.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/core/constants/app_constants.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
-import 'package:frontend/features/prediction/view/widgets/dashboard_card.dart';
-import 'package:frontend/features/prediction/view/widgets/drag_drop_zone.dart';
-import 'package:frontend/shared/widgets/adaptive_button.dart';
+import 'package:cxc/app/routes.dart';
+import 'package:cxc/features/prediction/services/image_data_service.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/core/constants/app_constants.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
+import 'package:cxc/features/prediction/view/widgets/dashboard_card.dart';
+import 'package:cxc/features/prediction/view/widgets/drag_drop_zone.dart';
+import 'package:cxc/shared/widgets/adaptive_button.dart';
 import 'image_preview_page.dart';
 import 'permission_error_page.dart';
 
@@ -289,6 +289,7 @@ class DashboardPageState extends State<DashboardPage> {
           context: context,
           title: 'Upload X-Ray',
           subtitle: 'Select scan from gallery',
+          actionLabel: 'Choose Image',
           icon: Icons.upload_file_rounded,
           color: AppColors.primary,
           onTap: () => handleImageSelection(fromCamera: false),
@@ -298,6 +299,7 @@ class DashboardPageState extends State<DashboardPage> {
           context: context,
           title: 'Model Docs',
           subtitle: 'View available backend model details',
+          actionLabel: 'View Docs',
           icon: Icons.library_books_outlined,
           color: AppColors.primaryDark,
           onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.docs),
@@ -308,6 +310,7 @@ class DashboardPageState extends State<DashboardPage> {
             context: context,
             title: 'Take Photo',
             subtitle: 'Capture a live X-Ray scan',
+            actionLabel: 'Open Camera',
             icon: Icons.camera_enhance_rounded,
             color: AppColors.primaryDark,
             onTap: () => handleImageSelection(fromCamera: true),
@@ -388,6 +391,7 @@ class DashboardPageState extends State<DashboardPage> {
     required BuildContext context,
     required String title,
     required String subtitle,
+    required String actionLabel,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
@@ -395,6 +399,7 @@ class DashboardPageState extends State<DashboardPage> {
     return DashboardCard(
       title: title,
       subtitle: subtitle,
+      actionLabel: actionLabel,
       icon: icon,
       themeColor: color,
       features: const [],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/routes.dart';
-import 'package:frontend/features/docs/controllers/docs_controller.dart';
-import 'package:frontend/features/docs/models/model_info.dart';
-import 'package:frontend/features/docs/view/widgets/model_info_card.dart';
+import 'package:cxc/app/routes.dart';
+import 'package:cxc/features/docs/controllers/docs_controller.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
+import 'package:cxc/features/docs/view/widgets/model_info_card.dart';
 
 class ModelsInfoPage extends StatefulWidget {
   const ModelsInfoPage({super.key});

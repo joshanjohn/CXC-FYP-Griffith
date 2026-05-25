@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/core/constants/app_constants.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/core/constants/app_constants.dart';
 
 /// A premium drag-and-drop zone for desktop and web
 class DragDropZone extends StatefulWidget {

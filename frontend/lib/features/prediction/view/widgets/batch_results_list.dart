@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/features/prediction/models/prediction_response_model.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/features/prediction/models/prediction_response_model.dart';
 
 class BatchResultsList extends StatelessWidget {
   final List<PredictionResponseModel> results;

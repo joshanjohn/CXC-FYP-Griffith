@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/shared/widgets/adaptive_button.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/shared/widgets/adaptive_button.dart';
 
 class BatchControlPanel extends StatelessWidget {
   final bool isProcessing;

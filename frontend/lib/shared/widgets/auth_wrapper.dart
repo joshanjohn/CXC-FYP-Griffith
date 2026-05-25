@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/features/auth/view/pages/login_page.dart';
-import 'package:frontend/shared/widgets/navigation_shell.dart';
+import 'package:cxc/features/auth/view/pages/login_page.dart';
+import 'package:cxc/shared/widgets/navigation_shell.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});

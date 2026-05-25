@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
+import 'package:cxc/app/themes/app_colors.dart';
 
 class PredictionChart extends StatelessWidget {
   final Map<String, double> allConfidences;

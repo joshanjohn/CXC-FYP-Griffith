@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/features/docs/models/model_info.dart';
-import 'package:frontend/features/docs/view/widgets/model_metric_chip.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
+import 'package:cxc/features/docs/view/widgets/model_metric_chip.dart';
 
 class ModelInfoCard extends StatelessWidget {
   const ModelInfoCard({

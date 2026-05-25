@@ -2,16 +2,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/core/constants/app_constants.dart';
-import 'package:frontend/core/utils/download_file/download_file.dart';
-import 'package:frontend/features/prediction/models/prediction_response_model.dart';
-import 'package:frontend/features/prediction/services/prediction_service.dart';
-import 'package:frontend/features/prediction/view/widgets/batch_aggregation_stats.dart';
-import 'package:frontend/features/prediction/view/widgets/batch_control_panel.dart';
-import 'package:frontend/features/prediction/view/widgets/batch_results_list.dart';
-import 'package:frontend/features/prediction/view/widgets/batch_upload_area.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/core/constants/app_constants.dart';
+import 'package:cxc/core/utils/download_file/download_file.dart';
+import 'package:cxc/features/prediction/models/prediction_response_model.dart';
+import 'package:cxc/features/prediction/services/prediction_service.dart';
+import 'package:cxc/features/prediction/view/widgets/batch_aggregation_stats.dart';
+import 'package:cxc/features/prediction/view/widgets/batch_control_panel.dart';
+import 'package:cxc/features/prediction/view/widgets/batch_results_list.dart';
+import 'package:cxc/features/prediction/view/widgets/batch_upload_area.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
 
 class BatchPredictionPage extends StatefulWidget {
   const BatchPredictionPage({super.key});
@@ -68,7 +68,7 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
-      withData: kIsWeb,
+      withData: kIsWeb || (!kIsWeb && Platform.isMacOS),
     );
 
     if (result != null) {
@@ -177,6 +177,10 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
   }
 
   Future<Uint8List> readSelectedFile(PlatformFile file) async {
+    if (file.bytes != null) {
+      return file.bytes!;
+    }
+
     if (kIsWeb) {
       if (file.bytes == null) {
         throw Exception(

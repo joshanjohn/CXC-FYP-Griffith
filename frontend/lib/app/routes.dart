@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/docs/models/model_info.dart';
-import 'package:frontend/features/docs/view/pages/model_info_detail_page.dart';
-import 'package:frontend/features/prediction/view/pages/image_preview_page.dart';
-import 'package:frontend/features/prediction/view/pages/permission_error_page.dart';
-import 'package:frontend/features/auth/view/pages/login_page.dart';
-import 'package:frontend/features/auth/view/pages/signup_page.dart';
-import 'package:frontend/shared/widgets/navigation_shell.dart';
+import 'package:cxc/features/docs/models/model_info.dart';
+import 'package:cxc/features/docs/view/pages/model_info_detail_page.dart';
+import 'package:cxc/features/prediction/view/pages/image_preview_page.dart';
+import 'package:cxc/features/prediction/view/pages/permission_error_page.dart';
+import 'package:cxc/features/auth/view/pages/login_page.dart';
+import 'package:cxc/features/auth/view/pages/signup_page.dart';
+import 'package:cxc/shared/widgets/navigation_shell.dart';
 
-import 'package:frontend/shared/widgets/auth_wrapper.dart';
+import 'package:cxc/shared/widgets/auth_wrapper.dart';
 
 class AppRoutes {
   static const String initial = '/';

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/app/routes.dart';
-import 'package:frontend/shared/responsive/responsive_helper.dart';
-import 'package:frontend/shared/widgets/adaptive_button.dart';
-import 'package:frontend/shared/widgets/image_display_widget.dart';
-import 'package:frontend/app/themes/app_colors.dart';
-import 'package:frontend/core/constants/app_constants.dart';
-import 'package:frontend/features/prediction/controllers/prediction_controller.dart';
-import 'package:frontend/features/prediction/models/prediction_response_model.dart';
-import 'package:frontend/features/prediction/view/widgets/prediction_chart.dart';
-import 'package:frontend/shared/widgets/persistent_top_nav.dart';
+import 'package:cxc/app/routes.dart';
+import 'package:cxc/shared/responsive/responsive_helper.dart';
+import 'package:cxc/shared/widgets/adaptive_button.dart';
+import 'package:cxc/shared/widgets/image_display_widget.dart';
+import 'package:cxc/app/themes/app_colors.dart';
+import 'package:cxc/core/constants/app_constants.dart';
+import 'package:cxc/features/prediction/controllers/prediction_controller.dart';
+import 'package:cxc/features/prediction/models/prediction_response_model.dart';
+import 'package:cxc/features/prediction/view/widgets/prediction_chart.dart';
+import 'package:cxc/shared/widgets/persistent_top_nav.dart';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
