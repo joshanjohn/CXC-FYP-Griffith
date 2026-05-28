@@ -220,7 +220,7 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
       return;
     }
 
-    showMessage('ZIP downloaded successfully.');
+    showMessage('ZIP download cancelled.');
   }
 
   @override

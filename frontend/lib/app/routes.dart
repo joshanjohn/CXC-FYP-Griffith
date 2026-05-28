@@ -26,10 +26,14 @@ class AppRoutes {
     shell: (context) => const AuthWrapper(),
     login: (context) => const LoginPage(),
     signup: (context) => const SignupPage(),
-    workspace: (context) => const MainShell(initialIndex: 0),
-    batch: (context) => const MainShell(initialIndex: 2),
-    docs: (context) => const MainShell(initialIndex: 3),
-    profile: (context) => const MainShell(initialIndex: 4),
+    workspace: (context) =>
+        const AuthWrapper(authenticatedChild: MainShell(initialIndex: 0)),
+    batch: (context) =>
+        const AuthWrapper(authenticatedChild: MainShell(initialIndex: 2)),
+    docs: (context) =>
+        const AuthWrapper(authenticatedChild: MainShell(initialIndex: 3)),
+    profile: (context) =>
+        const AuthWrapper(authenticatedChild: MainShell(initialIndex: 4)),
     error: (context) =>
         const PermissionErrorPage(permissionName: '', description: ''),
   };
@@ -38,7 +42,9 @@ class AppRoutes {
     if (settings.name == preview) {
       final source = settings.arguments;
       return MaterialPageRoute(
-        builder: (context) => ImagePreviewPage(imageSource: source),
+        builder: (context) => AuthWrapper(
+          authenticatedChild: ImagePreviewPage(imageSource: source),
+        ),
       );
     }
     if (settings.name != null && settings.name!.startsWith('$docsModelBase/')) {
@@ -47,9 +53,11 @@ class AppRoutes {
           ? settings.arguments as ModelInfo
           : null;
       return MaterialPageRoute(
-        builder: (context) => ModelInfoDetailPage(
-          modelName: modelName,
-          initialModelInfo: initialModelInfo,
+        builder: (context) => AuthWrapper(
+          authenticatedChild: ModelInfoDetailPage(
+            modelName: modelName,
+            initialModelInfo: initialModelInfo,
+          ),
         ),
       );
     }

@@ -1,6 +1,6 @@
 import 'dart:developer' as dev;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cxc/core/services/auth_token_service.dart';
+import 'package:cxc/features/auth/services/auth_token_service.dart';
 
 class AuthController {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

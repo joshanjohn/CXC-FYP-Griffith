@@ -55,10 +55,8 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
         availableModels = models
             .where((model) => model.toLowerCase() != 'default')
             .toList();
-        if (!availableModels.contains(selectedModel)) {
-          selectedModel = availableModels.isNotEmpty
-              ? availableModels.first
-              : 'cxc201';
+        if (availableModels.isNotEmpty) {
+          selectedModel = availableModels.first;
         }
       });
     }
@@ -520,7 +518,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   Expanded(
                     child: AdaptiveButton(
                       text: analysisResults == null
-                          ? 'Process Scan'
+                          ? 'Analyze'
                           : 'Re-Analyze',
                       onPressed: _analyzeImage,
                       icon: Icons.biotech_rounded,

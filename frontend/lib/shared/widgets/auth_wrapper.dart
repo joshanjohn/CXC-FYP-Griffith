@@ -4,7 +4,9 @@ import 'package:cxc/features/auth/view/pages/login_page.dart';
 import 'package:cxc/shared/widgets/navigation_shell.dart';
 
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+  const AuthWrapper({super.key, this.authenticatedChild});
+
+  final Widget? authenticatedChild;
 
   @override
   Widget build(BuildContext context) {
@@ -14,22 +16,18 @@ class AuthWrapper extends StatelessWidget {
         // If the connection is active, check the auth state
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
-          
+
           if (user == null) {
             // No user is logged in, show login
             return const LoginPage();
           } else {
             // User is logged in, show dashboard
-            return const MainShell();
+            return authenticatedChild ?? const MainShell();
           }
         }
 
         // Show a loading indicator while checking auth state
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'app/app.dart';
-import 'core/services/auth_token_service.dart';
+import 'features/auth/services/auth_token_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

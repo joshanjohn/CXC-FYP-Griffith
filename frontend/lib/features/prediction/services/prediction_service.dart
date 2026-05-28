@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cxc/core/constants/app_variables.dart';
-import 'package:cxc/core/services/auth_token_service.dart';
+import 'package:cxc/features/auth/services/auth_token_service.dart';
 import 'package:cxc/features/prediction/models/prediction_response_model.dart';
 import 'package:cxc/core/utils/platform_url.dart';
 
@@ -208,6 +208,11 @@ class PredictionService {
     try {
       final headers = await getHeaders();
       final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 401) {
+        await FirebaseAuth.instance.signOut();
+        throw Exception('Session expired. Please log in again.');
+      }
 
       if (response.statusCode != 200) {
         throw Exception(

@@ -1,16 +1,31 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<String?> saveDownloadedFile(Uint8List bytes, String filename) async {
+  final safeFilename = filename.trim().isEmpty
+      ? 'classified_images.zip'
+      : sanitizeFilename(filename);
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    return FilePicker.platform.saveFile(
+      dialogTitle: 'Save classified images ZIP',
+      fileName: safeFilename,
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+      bytes: bytes,
+    );
+  }
+
   final candidateDirectories = await resolveDownloadDirectories();
 
   Object? lastError;
   for (final directory in candidateDirectories) {
     try {
       await directory.create(recursive: true);
-      final filePath = buildUniquePath(directory.path, filename);
+      final filePath = buildUniquePath(directory.path, safeFilename);
       final file = File(filePath);
       await file.writeAsBytes(bytes, flush: true);
       return file.path;
