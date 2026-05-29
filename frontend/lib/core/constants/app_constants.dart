@@ -40,7 +40,7 @@ class AppConstants {
   // Analysis strings
   static const String analysisTitle = 'Diagnostic Preview';
   static const String analysisComplete = 'Analysis complete.';
-  static const String analysisScanning = 'AI is scanning the X-Ray...';
+  static const String analysisScanning = 'CXC model is scanning the X-Ray...';
   static const String analysisReady =
       'Ready for processing. Tap analyze to begin.';
 

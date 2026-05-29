@@ -28,8 +28,8 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _handleSignup() async {
-    if (_emailController.text.isEmpty || 
-        _passwordController.text.isEmpty || 
+    if (_emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
         _usernameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
@@ -38,14 +38,14 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     setState(() => _isCreating = true);
-    
+
     try {
       await _authController.signup(
         _emailController.text.trim(),
         _passwordController.text,
         _usernameController.text.trim(),
       );
-      
+
       if (mounted) {
         setState(() => _isCreating = false);
         ScaffoldMessenger.of(context).showSnackBar(

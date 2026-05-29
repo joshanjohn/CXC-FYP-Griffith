@@ -15,7 +15,7 @@ class AuthTokenService {
   Future<void> initialize() async {
     // Load cached token from storage
     cachedToken = await storage.read(key: 'firebase_token');
-    
+
     // Listen to token changes and update storage
     auth.idTokenChanges().listen((User? user) async {
       if (user != null) {
@@ -40,7 +40,7 @@ class AuthTokenService {
       await storage.write(key: 'firebase_token', value: token);
       return token;
     }
-    
+
     // Fallback to storage if user object isn't immediately available
     cachedToken ??= await storage.read(key: 'firebase_token');
     return cachedToken;

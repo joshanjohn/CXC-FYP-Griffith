@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary Brand Colors
   // Primary Brand Colors (Medicai Cyan/Teal)
-  static const Color primary = Color(0xFF00B4D8); 
+  static const Color primary = Color(0xFF00B4D8);
   static const Color primaryDark = Color(0xFF0077B6);
   static const Color accent = Color(0xFF48CAE4);
 
-  static const Color backgroundLight = Color(
-    0xFFF0F9FF,
-  );
+  static const Color backgroundLight = Color(0xFFF0F9FF);
   static const Color surfaceLight = Colors.white;
   static const Color onSurfaceLight = Color(0xFF1E293B);
   static const Color outlineLight = Color(0xFFE2E8F0);

@@ -52,10 +52,7 @@ class BatchUploadArea extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-               Text(
-                'JPG and PNG supported',
-                style: theme.textTheme.bodySmall,
-              ),
+              Text('JPG and PNG supported', style: theme.textTheme.bodySmall),
             ],
           ),
         ),

@@ -13,7 +13,6 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -36,13 +35,13 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => isLoggingIn = true);
-    
+
     try {
       await authController.login(
         emailController.text.trim(),
         passwordController.text,
       );
-      
+
       if (mounted) {
         setState(() => isLoggingIn = false);
         Navigator.pushReplacementNamed(context, '/');

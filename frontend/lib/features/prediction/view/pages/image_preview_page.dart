@@ -517,9 +517,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   const SizedBox(width: 16),
                   Expanded(
                     child: AdaptiveButton(
-                      text: analysisResults == null
-                          ? 'Analyze'
-                          : 'Re-Analyze',
+                      text: analysisResults == null ? 'Analyze' : 'Re-Analyze',
                       onPressed: _analyzeImage,
                       icon: Icons.biotech_rounded,
                       isLoading: isAnalyzing,

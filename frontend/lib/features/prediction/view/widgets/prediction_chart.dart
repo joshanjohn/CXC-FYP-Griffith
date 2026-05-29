@@ -11,7 +11,7 @@ class PredictionChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     // Sort confidences by value descending
     final sortedEntries = allConfidences.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -37,8 +37,13 @@ class PredictionChart extends StatelessWidget {
               barTouchData: BarTouchData(
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) => isDark ? AppColors.surfaceDark : Colors.white,
-                  tooltipBorder: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1)),
+                  getTooltipColor: (_) =>
+                      isDark ? AppColors.surfaceDark : Colors.white,
+                  tooltipBorder: BorderSide(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.1),
+                  ),
                   tooltipBorderRadius: BorderRadius.circular(8),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
@@ -77,7 +82,9 @@ class PredictionChart extends StatelessWidget {
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                         ),
                       );
@@ -109,8 +116,14 @@ class PredictionChart extends StatelessWidget {
                       toY: value,
                       gradient: LinearGradient(
                         colors: isTop
-                            ? [AppColors.primary, AppColors.primary.withValues(alpha: 0.6)]
-                            : [AppColors.accent.withValues(alpha: 0.8), AppColors.accent.withValues(alpha: 0.4)],
+                            ? [
+                                AppColors.primary,
+                                AppColors.primary.withValues(alpha: 0.6),
+                              ]
+                            : [
+                                AppColors.accent.withValues(alpha: 0.8),
+                                AppColors.accent.withValues(alpha: 0.4),
+                              ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                       ),
@@ -121,7 +134,7 @@ class PredictionChart extends StatelessWidget {
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,
                         toY: 1.0,
-                        color: isDark 
+                        color: isDark
                             ? Colors.white.withValues(alpha: 0.05)
                             : Colors.black.withValues(alpha: 0.05),
                       ),
