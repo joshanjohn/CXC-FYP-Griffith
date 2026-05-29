@@ -132,23 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
                   ),
-                  const SizedBox(height: 12),
-
-                  // forgot password link
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Recover Access',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // login button
                   AdaptiveButton(

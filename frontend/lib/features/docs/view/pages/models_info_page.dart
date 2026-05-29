@@ -52,7 +52,7 @@ class ModelsInfoPageState extends State<ModelsInfoPage> {
                 maxCrossAxisExtent: 340,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 20,
-                mainAxisExtent: 220,
+                mainAxisExtent: 260,
               ),
               itemCount: models.length,
               itemBuilder: (context, index) {

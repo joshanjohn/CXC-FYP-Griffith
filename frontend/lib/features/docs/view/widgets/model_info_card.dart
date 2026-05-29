@@ -71,7 +71,7 @@ class ModelInfoCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 modelInfo.description,
-                maxLines: 4,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),

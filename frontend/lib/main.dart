@@ -27,6 +27,7 @@ class MainApp extends StatelessWidget {
       designSize: const Size(390, 844),
       minTextAdapt: true,
       splitScreenMode: true,
+      rebuildFactor: RebuildFactors.none,
       builder: (context, child) {
         return const ChestXRayApp();
       },
