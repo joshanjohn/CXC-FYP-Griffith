@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from src.api.services.PredictionService import PredictionService
+from src.api.services.ModelService import ModelService
 from src.utils.api_deps import get_current_user
 
 router = APIRouter(
@@ -8,7 +8,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)]
 )
 
-prediction_service = PredictionService()
+model_service = ModelService()
 
 
 @router.get("/models")
@@ -16,7 +16,7 @@ async def get_models():
     """
     GET endpoint for returning list of available models.
     """
-    models = prediction_service.get_available_models()
+    models = model_service.get_available_models()
     return JSONResponse({"models": models})
 
 
@@ -25,5 +25,5 @@ async def get_models_info():
     """
     GET endpoint for returning detailed information for all available models.
     """
-    models = prediction_service.get_models_info()
+    models = model_service.get_models_info()
     return JSONResponse({"models": models})
