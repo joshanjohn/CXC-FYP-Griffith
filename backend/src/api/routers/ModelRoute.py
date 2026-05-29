@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from src.api.services.ModelService import ModelService
-from src.utils.api_deps import get_current_user
+from src.api.middleware.api_deps import get_current_user
 
 router = APIRouter(
     tags=["models"],

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, Query, HTTPException, Depends, BackgroundTasks, Form
 from fastapi.responses import JSONResponse, FileResponse
 from src.api.services.PredictionService import PredictionService
-from src.utils.api_deps import get_current_user
+from src.api.middleware.api_deps import get_current_user
 import os
 import uuid
 import shutil
@@ -10,8 +10,13 @@ from pathlib import Path
 from src.constants.constants import CLASS_NAMES
 from src.logging import get_logger
 
+# temp directory path
 TEMP_BASE_DIR = os.path.join(tempfile.gettempdir(), "cxc_batch")
+
+# create a directory 
 os.makedirs(TEMP_BASE_DIR, exist_ok=True)
+
+
 logger = get_logger(__name__)
 
 router = APIRouter(
@@ -28,8 +33,10 @@ def validate_filename(filename: str | None) -> str:
     """
     # if original file na,me is none set default to upload.jpg
     original_name = Path(filename or "upload.jpg").name
+
     # extract file name 
     stem = Path(original_name).stem or "upload"
+    
     # extratc file extension name 
     suffix = Path(original_name).suffix or ".jpg"
     
@@ -81,9 +88,11 @@ async def predict_batch(
     Classify multiple images within a batch session using a single batched inference call.
     """
     session_dir = os.path.join(TEMP_BASE_DIR, session_id)
+
     if not os.path.exists(session_dir):
         raise HTTPException(status_code=404, detail="Session not found")
 
+    # check if the file exist
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
 
@@ -109,6 +118,7 @@ async def predict_batch(
             predicted_class,
             validate_filename(original_filename),
         )
+
         with open(file_path, "wb") as f:
             f.write(contents)
 

@@ -3,36 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 import uvicorn
 import os
-import firebase_admin
-from firebase_admin import credentials
 from src.logging import configure_logging, get_logger
 from src.constants.constants import APP_LOG_LEVEL
-from src.constants.variables import FIREBASE_CREDENTIALS_PATH, FIREBASE_PROJECT_ID
 from src.constants.variables import PORT
 from src.api.routers.ModelRoute import router as model_router
 from src.api.routers.PredictionRoute import router as prediction_router
 
 configure_logging(APP_LOG_LEVEL)
 logger = get_logger(__name__)
-
-# Initialize Firebase Admin
-if not firebase_admin._apps:
-    try:
-        if FIREBASE_CREDENTIALS_PATH and os.path.exists(FIREBASE_CREDENTIALS_PATH):
-            firebaseCredentials = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
-            firebase_admin.initialize_app(
-                firebaseCredentials,
-                options={'projectId': FIREBASE_PROJECT_ID},
-            )
-            logger.info(
-                "Firebase initialized sucessfully",
-            )
-        else:
-            logger.info(
-                "Firebase Admin credentials not configured. Using public-key Firebase token verification."
-            )
-    except Exception as e:
-        logger.exception(f"Error initializing Firebase: {e}")
 
 
 app = FastAPI()
