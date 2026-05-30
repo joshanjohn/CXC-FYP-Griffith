@@ -108,44 +108,47 @@ class _AdaptiveButtonState extends State<AdaptiveButton>
                 borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (widget.isLoading)
-                        const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (widget.isLoading)
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        else ...[
+                          if (widget.icon != null) ...[
+                            Icon(
+                              widget.icon,
+                              color: widget.isPrimary
+                                  ? Colors.white
+                                  : theme.colorScheme.onSurface,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          Text(
+                            widget.text,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: widget.isPrimary
+                                  ? Colors.white
+                                  : theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
-                        )
-                      else ...[
-                        if (widget.icon != null) ...[
-                          Icon(
-                            widget.icon,
-                            color: widget.isPrimary
-                                ? Colors.white
-                                : theme.colorScheme.onSurface,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 12),
                         ],
-                        Text(
-                          widget.text,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: widget.isPrimary
-                                ? Colors.white
-                                : theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
