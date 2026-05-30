@@ -88,36 +88,7 @@ class PredictionService {
     }
   }
 
-  Future<List<String>> getAvailableModels() async {
-    if (baseUrl.isEmpty) {
-      return ['cxc201'];
-    }
-    final uri = Uri.parse('$baseUrl/models');
 
-    try {
-      final headers = await getHeaders();
-      final response = await http.get(uri, headers: headers);
-
-      if (response.statusCode == 200) {
-        final decodedData = json.decode(response.body);
-        final models = List<String>.from(decodedData['models']);
-        final filteredModels = models
-            .where((model) => model.toLowerCase() != 'default')
-            .toList();
-
-        return filteredModels.isNotEmpty ? filteredModels : ['cxc201'];
-      } else if (response.statusCode == 401) {
-        await FirebaseAuth.instance.signOut();
-        throw Exception('Session expired. Please log in again.');
-      } else {
-        throw Exception(
-          'Failed to fetch models: ${response.statusCode} - ${response.body}',
-        );
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
 
   Future<String> startBatchSession() async {
     if (baseUrl.isEmpty) {

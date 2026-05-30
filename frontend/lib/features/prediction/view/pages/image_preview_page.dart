@@ -6,6 +6,7 @@ import 'package:cxc/shared/widgets/image_display_widget.dart';
 import 'package:cxc/app/themes/app_colors.dart';
 import 'package:cxc/core/constants/app_constants.dart';
 import 'package:cxc/features/prediction/controllers/prediction_controller.dart';
+import 'package:cxc/features/prediction/controllers/model_controller.dart';
 import 'package:cxc/features/prediction/models/prediction_response_model.dart';
 import 'package:cxc/features/prediction/view/widgets/prediction_chart.dart';
 import 'package:cxc/shared/widgets/persistent_top_nav.dart';
@@ -27,6 +28,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   bool isAnalyzing = false;
   PredictionResponseModel? analysisResults;
   final predictionController = PredictionController();
+  final modelController = ModelController();
   late AnimationController slideController;
   late Animation<Offset> slideAnimation;
 
@@ -49,7 +51,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
   }
 
   Future<void> _fetchModels() async {
-    final models = await predictionController.getAvailableModels();
+    final models = await modelController.getAvailableModels();
     if (mounted) {
       setState(() {
         availableModels = models

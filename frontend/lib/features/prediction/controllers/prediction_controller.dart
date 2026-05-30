@@ -16,12 +16,4 @@ class PredictionController {
       modelName: modelName,
     );
   }
-
-  Future<List<String>> getAvailableModels() async {
-    try {
-      return await predictionService.getAvailableModels();
-    } catch (e) {
-      return ['cxc201'];
-    }
-  }
 }
