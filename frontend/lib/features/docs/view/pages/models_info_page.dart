@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cxc/app/routes.dart';
 import 'package:cxc/features/docs/controllers/docs_controller.dart';
 import 'package:cxc/features/docs/models/model_info.dart';
-import 'package:cxc/features/docs/view/widgets/model_info_card.dart';
+import 'package:cxc/features/docs/view/widgets/models_grid.dart';
 
 class ModelsInfoPage extends StatefulWidget {
   const ModelsInfoPage({super.key});
@@ -43,32 +42,7 @@ class ModelsInfoPageState extends State<ModelsInfoPage> {
           return const Center(child: Text('No model documentation available.'));
         }
 
-        return Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1120),
-            child: GridView.builder(
-              padding: const EdgeInsets.all(24),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 340,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                mainAxisExtent: 260,
-              ),
-              itemCount: models.length,
-              itemBuilder: (context, index) {
-                final modelInfo = models[index];
-                return ModelInfoCard(
-                  modelInfo: modelInfo,
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    '${AppRoutes.docsModelBase}/${modelInfo.name}',
-                    arguments: modelInfo,
-                  ),
-                );
-              },
-            ),
-          ),
-        );
+        return ModelsGrid(models: models);
       },
     );
   }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cxc/app/routes.dart';
-import 'package:cxc/app/themes/app_colors.dart';
 import 'package:cxc/features/docs/controllers/docs_controller.dart';
 import 'package:cxc/features/docs/models/model_info.dart';
-import 'package:cxc/features/docs/view/widgets/model_info_image_panel.dart';
-import 'package:cxc/features/docs/view/widgets/model_info_stat_card.dart';
+import 'package:cxc/features/docs/view/widgets/model_info_detail_header.dart';
+import 'package:cxc/features/docs/view/widgets/model_info_image_section.dart';
 import 'package:cxc/shared/responsive/responsive_helper.dart';
 import 'package:cxc/shared/widgets/persistent_top_nav.dart';
 
@@ -47,7 +46,6 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final showCameraItem = ResponsiveHelper.isPlatformMobile();
 
     return Scaffold(
@@ -136,133 +134,9 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
                             label: const Text('Back'),
                           ),
                           const SizedBox(height: 16),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary.withValues(alpha: 0.12),
-                                  AppColors.primaryDark.withValues(alpha: 0.08),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        modelInfo.name,
-                                        style: theme.textTheme.headlineMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                      ),
-                                    ),
-                                    if (modelInfo.isDefault)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary.withValues(
-                                            alpha: 0.12,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            999,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Default',
-                                          style: theme.textTheme.labelLarge
-                                              ?.copyWith(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  modelInfo.description,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.78),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                Wrap(
-                                  spacing: 16,
-                                  runSpacing: 16,
-                                  children: [
-                                    ModelInfoStatCard(
-                                      label: 'Model Accuracy',
-                                      value: modelInfo.modelAccuracy
-                                          .toStringAsFixed(2),
-                                    ),
-                                    ModelInfoStatCard(
-                                      label: 'Validation Accuracy',
-                                      value: modelInfo.valAccuracy
-                                          .toStringAsFixed(2),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                          ModelInfoDetailHeader(modelInfo: modelInfo),
                           const SizedBox(height: 28),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final twoColumns = constraints.maxWidth >= 900;
-                              final panels = [
-                                ModelInfoImagePanel(
-                                  title: 'Test Confusion Matrix',
-                                  assetPath: modelInfo.testConfusionImg,
-                                ),
-                                ModelInfoImagePanel(
-                                  title: 'Test ROC Curve',
-                                  assetPath: modelInfo.testRocImg,
-                                ),
-                                ModelInfoImagePanel(
-                                  title: 'Validation Confusion Matrix',
-                                  assetPath: modelInfo.valConfusionImg,
-                                ),
-                                ModelInfoImagePanel(
-                                  title: 'Validation ROC Curve',
-                                  assetPath: modelInfo.valRocImg,
-                                ),
-                              ];
-
-                              if (!twoColumns) {
-                                return Column(
-                                  children: [
-                                    for (final panel in panels) ...[
-                                      panel,
-                                      const SizedBox(height: 20),
-                                    ],
-                                  ],
-                                );
-                              }
-
-                              return Wrap(
-                                spacing: 20,
-                                runSpacing: 20,
-                                children: panels
-                                    .map(
-                                      (panel) => SizedBox(
-                                        width: (constraints.maxWidth - 20) / 2,
-                                        child: panel,
-                                      ),
-                                    )
-                                    .toList(),
-                              );
-                            },
-                          ),
+                          ModelInfoImageSection(modelInfo: modelInfo),
                         ],
                       ),
                     ),
