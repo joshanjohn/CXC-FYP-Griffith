@@ -1,7 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 String resolveBackendUrl(String url, {String mobileUrl = ''}) {
+  final hostUri = dotenv.get('HOST_URI', fallback: "");
+  if (hostUri.isNotEmpty) {
+    return 'https://cxc-backend-8i6a.onrender.com';
+  }
+
   if (kIsWeb) {
     return url;
   }

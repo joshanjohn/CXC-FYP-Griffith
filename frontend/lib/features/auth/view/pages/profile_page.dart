@@ -87,16 +87,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return value;
   }
 
-  String _formatDate(DateTime? value) {
-    if (value == null) return 'Unavailable';
-    final local = value.toLocal();
-    final twoDigitMonth = local.month.toString().padLeft(2, '0');
-    final twoDigitDay = local.day.toString().padLeft(2, '0');
-    final twoDigitHour = local.hour.toString().padLeft(2, '0');
-    final twoDigitMinute = local.minute.toString().padLeft(2, '0');
-    return '${local.year}-$twoDigitMonth-$twoDigitDay '
-        '$twoDigitHour:$twoDigitMinute';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     final infoRows = <MapEntry<String, String>>[
-      MapEntry('Username', _displayValue(user.displayName)),
       MapEntry('Email', _displayValue(user.email)),
-      MapEntry(
-        'Email verified',
-        user.emailVerified ? 'Verified' : 'Not verified',
-      ),
-      MapEntry('Account created', _formatDate(user.metadata.creationTime)),
-      MapEntry('Last sign in', _formatDate(user.metadata.lastSignInTime)),
     ];
 
     return Scaffold(
@@ -184,23 +167,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _displayValue(user.displayName),
+                                    _displayValue(user.email),
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       color: isDark
                                           ? Colors.white
                                           : AppColors.onSurfaceLight,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _displayValue(user.email),
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.65)
-                                          : AppColors.onSurfaceLight.withValues(
-                                              alpha: 0.65,
-                                            ),
                                     ),
                                   ),
                                 ],
