@@ -23,7 +23,6 @@ dependencies = [
     "streamlit>=1.54.0",
     "tabulate",
     "tensorflow==2.16.1",
-    "tensorflow-metal==1.1.0",
     "uvicorn>=0.41.0",
     "watchdog>=6.0.0",
     "firebase-admin>=6.5.0",
