@@ -25,7 +25,7 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
   final DocsController docsController = DocsController();
   late final Future<ModelInfo?> modelFuture;
 
-  void _handleBackNavigation() {
+  void handleBackNavigation() {
     final navigator = Navigator.of(context);
     if (navigator.canPop()) {
       navigator.pop();
@@ -129,7 +129,7 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextButton.icon(
-                            onPressed: _handleBackNavigation,
+                            onPressed: handleBackNavigation,
                             icon: const Icon(Icons.arrow_back_rounded),
                             label: const Text('Back'),
                           ),
