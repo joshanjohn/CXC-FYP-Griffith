@@ -26,20 +26,28 @@ class ModelInfoDetailPageState extends State<ModelInfoDetailPage> {
   late final Future<ModelInfo?> modelFuture;
 
   void handleBackNavigation() {
+    // Get the current navigator instance
     final navigator = Navigator.of(context);
+
+    // Return to the previous screen if possible
     if (navigator.canPop()) {
       navigator.pop();
       return;
     }
 
+    // Navigate to the documentation screen if no previous route exists
     navigator.pushReplacementNamed(AppRoutes.docs);
   }
 
   @override
   void initState() {
     super.initState();
+
+    // Load model information when the screen is created
     modelFuture = docsController.getModelInfoByName(
       widget.modelName,
+
+      // Use provided model data before fetching from cache or API
       fallback: widget.initialModelInfo,
     );
   }

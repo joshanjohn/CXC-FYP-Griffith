@@ -2,9 +2,11 @@ import 'dart:developer' as dev;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cxc/features/auth/services/auth_token_service.dart';
 
+// Firebase Auth Controller
 class AuthController {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
+  // login 
   Future<UserCredential> login(String email, String password) async {
     dev.log('[AuthController] Login attempt for email: $email');
     try {
@@ -25,18 +27,21 @@ class AuthController {
     }
   }
 
+  // sign up or register 
   Future<UserCredential> signup(
     String email,
-    String password,
-    String username,
-  ) async {
+    String password, [
+    String? username,
+  ]) async {
     dev.log('[AuthController] Signup attempt for email: $email');
     try {
       final UserCredential userCredential = await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      // Update display name with the username
-      await userCredential.user?.updateDisplayName(username);
+      final String displayName = (username != null && username.isNotEmpty)
+          ? username
+          : email.split('@').first;
+      await userCredential.user?.updateDisplayName(displayName);
 
       dev.log(
         '[AuthController] Signup successful for user: ${userCredential.user?.uid}',
@@ -53,14 +58,18 @@ class AuthController {
     }
   }
 
+  // logout 
   Future<void> logout() async {
     await firebaseAuth.signOut();
     await AuthTokenService().clearToken();
     dev.log('[AuthController] User logged out');
   }
 
+  // delete auth from firebase
   Future<void> deleteCurrentUserAccount() async {
     final user = firebaseAuth.currentUser;
+
+    // checking user exist 
     if (user == null) {
       throw Exception('No signed-in user found.');
     }
@@ -87,7 +96,9 @@ class AuthController {
     }
   }
 
+  // current user 
   User? get currentUser => firebaseAuth.currentUser;
 
+  // flag for auth status 
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 }

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cxc/app/themes/app_colors.dart';
 import 'package:cxc/features/auth/controllers/auth_controller.dart';
@@ -17,7 +16,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isSigningOut = false;
   bool isDeleting = false;
 
-  Future<void> _handleSignOut() async {
+  Future<void> handleSignOut() async {
     setState(() => isSigningOut = true);
 
     try {
@@ -34,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _handleDeleteAccount() async {
+  Future<void> handleDeleteAccount() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -80,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  String _displayValue(String? value) {
+  String displayValue(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Not provided';
     }
@@ -92,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = authController.currentUser;
     final maxWidth = ResponsiveHelper.getMaxContentWidth(context);
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final borderColor = isDark
@@ -104,7 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     final infoRows = <MapEntry<String, String>>[
-      MapEntry('Email', _displayValue(user.email)),
+      MapEntry('Email', displayValue(user.email)),
     ];
 
     return Scaffold(
@@ -167,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _displayValue(user.email),
+                                    displayValue(user.email),
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       color: isDark
@@ -236,7 +235,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: AdaptiveButton(
                                 text: 'Sign Out',
                                 icon: Icons.logout_rounded,
-                                onPressed: _handleSignOut,
+                                onPressed: handleSignOut,
                                 isLoading: isSigningOut,
                                 isPrimary: false,
                                 width: double.infinity,
@@ -255,7 +254,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 onPressed: isDeleting
                                     ? null
-                                    : _handleDeleteAccount,
+                                    : handleDeleteAccount,
                                 icon: isDeleting
                                     ? const SizedBox(
                                         width: 18,

@@ -130,9 +130,9 @@ class DashboardPageState extends State<DashboardPage> {
                   child: Column(
                     children: [
                       if (isMobile) ...[
-                        _buildHeroSection(context, theme, isDark),
+                        buildHeroSection(context, theme, isDark),
                         const SizedBox(height: 48),
-                        _buildMobileUpload(context, isDeviceMobile),
+                        buildMobileUpload(context, isDeviceMobile),
                       ] else ...[
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -143,9 +143,9 @@ class DashboardPageState extends State<DashboardPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildFeatureBadge(theme),
+                                  buildFeatureBadge(theme),
                                   const SizedBox(height: 24),
-                                  _buildHeroText(
+                                  buildHeroText(
                                     context,
                                     theme,
                                     isDark,
@@ -158,7 +158,7 @@ class DashboardPageState extends State<DashboardPage> {
                                     textAlign: TextAlign.left,
                                   ),
                                   const SizedBox(height: 8),
-                                  _buildWarningText(
+                                  buildWarningText(
                                     context,
                                     theme,
                                     textAlign: TextAlign.left,
@@ -170,7 +170,7 @@ class DashboardPageState extends State<DashboardPage> {
                             // drop zone on the right
                             Expanded(
                               flex: 1,
-                              child: _buildUploadZone(context, theme, isDark),
+                              child: buildUploadZone(context, theme, isDark),
                             ),
                           ],
                         ),
@@ -192,7 +192,7 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildFeatureBadge(ThemeData theme) {
+  Widget buildFeatureBadge(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -210,7 +210,7 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildHeroText(
+  Widget buildHeroText(
     BuildContext context,
     ThemeData theme,
     bool isDark, {
@@ -245,7 +245,7 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildWarningText(
+  Widget buildWarningText(
     BuildContext context,
     ThemeData theme, {
     TextAlign textAlign = TextAlign.center,
@@ -261,16 +261,16 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildHeroSection(BuildContext context, ThemeData theme, bool isDark) {
+  Widget buildHeroSection(BuildContext context, ThemeData theme, bool isDark) {
     return Column(
       children: [
         const SizedBox(height: 40),
-        _buildFeatureBadge(theme),
+        buildFeatureBadge(theme),
         const SizedBox(height: 24),
-        _buildHeroText(context, theme, isDark),
+        buildHeroText(context, theme, isDark),
         const SizedBox(height: 16),
         _buildSubtitleText(context, theme),
-        _buildWarningText(context, theme),
+        buildWarningText(context, theme),
         const SizedBox(height: 20),
         OutlinedButton.icon(
           onPressed: () =>
@@ -282,10 +282,10 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildMobileUpload(BuildContext context, bool isDeviceMobile) {
+  Widget buildMobileUpload(BuildContext context, bool isDeviceMobile) {
     return Column(
       children: [
-        _buildMobileCard(
+        buildMobileCard(
           context: context,
           title: 'Upload X-Ray',
           subtitle: 'Select scan from gallery',
@@ -295,7 +295,7 @@ class DashboardPageState extends State<DashboardPage> {
           onTap: () => handleImageSelection(fromCamera: false),
         ),
         const SizedBox(height: 20),
-        _buildMobileCard(
+        buildMobileCard(
           context: context,
           title: 'Model Docs',
           subtitle: 'View available backend model details',
@@ -306,7 +306,7 @@ class DashboardPageState extends State<DashboardPage> {
         ),
         if (isDeviceMobile) ...[
           const SizedBox(height: 20),
-          _buildMobileCard(
+          buildMobileCard(
             context: context,
             title: 'Take Photo',
             subtitle: 'Capture a live X-Ray scan',
@@ -320,7 +320,7 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildUploadZone(BuildContext context, ThemeData theme, bool isDark) {
+  Widget buildUploadZone(BuildContext context, ThemeData theme, bool isDark) {
     return DragDropZone(
       onFilesDropped: (files) {
         if (files.isNotEmpty) {
@@ -387,7 +387,7 @@ class DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildMobileCard({
+  Widget buildMobileCard({
     required BuildContext context,
     required String title,
     required String subtitle,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Brand Colors
-  // Primary Brand Colors (Medicai Cyan/Teal)
+  // Primary Brand Colors
   static const Color primary = Color(0xFF00B4D8);
   static const Color primaryDark = Color(0xFF0077B6);
   static const Color accent = Color(0xFF48CAE4);
@@ -18,11 +18,9 @@ class AppColors {
   static const Color onSurfaceDark = Color(0xFFF8FAFC);
   static const Color outlineDark = Color(0xFF334155);
 
-  // Solid Simple Shades
   static const Color glassWhite = Colors.white;
   static const Color glassOutline = Color(0xFFF1F5F9);
 
-  // Semantic Colors
   static const Color error = Color(0xFFEF4444);
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);

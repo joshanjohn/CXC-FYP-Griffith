@@ -47,10 +47,10 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: slideController, curve: Curves.easeOut));
     slideController.forward();
-    _fetchModels();
+    fetchModels();
   }
 
-  Future<void> _fetchModels() async {
+  Future<void> fetchModels() async {
     final models = await modelController.getAvailableModels();
     if (mounted) {
       setState(() {
@@ -70,7 +70,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
     super.dispose();
   }
 
-  Future<void> _analyzeImage() async {
+  Future<void> analyzeImage() async {
     setState(() => isAnalyzing = true);
 
     try {
@@ -481,7 +481,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
           const SizedBox(height: 16),
           AdaptiveButton(
             text: analysisResults == null ? 'Analyze Scan' : 'Re-Analyze',
-            onPressed: _analyzeImage,
+            onPressed: analyzeImage,
             icon: Icons.biotech_rounded,
             isLoading: isAnalyzing,
             isPrimary: true,
@@ -520,7 +520,7 @@ class _ImagePreviewPageState extends State<ImagePreviewPage>
                   Expanded(
                     child: AdaptiveButton(
                       text: analysisResults == null ? 'Analyze' : 'Re-Analyze',
-                      onPressed: _analyzeImage,
+                      onPressed: analyzeImage,
                       icon: Icons.biotech_rounded,
                       isLoading: isAnalyzing,
                       isPrimary: true,

@@ -39,11 +39,15 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     );
   }
 
+  // Handle file picker button press
   Future<void> handlePickFilesTap() async {
     try {
+      // Open file picker
       await pickFiles();
     } catch (e) {
+      // Show error if file picker fails
       debugPrint('Batch picker error: $e');
+
       showMessage(
         'Could not open the file picker. Please try again.',
         backgroundColor: AppColors.error,
@@ -51,11 +55,15 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     }
   }
 
+  // Handle ZIP download button press
   Future<void> handleDownloadTap() async {
     try {
+      // Start ZIP download
       await downloadZip();
     } catch (e) {
+      // Show error if download fails
       debugPrint('Batch download error: $e');
+
       showMessage(
         'Could not start the ZIP download.',
         backgroundColor: AppColors.error,
@@ -63,6 +71,7 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     }
   }
 
+  // Select multiple image files
   Future<void> pickFiles() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -72,6 +81,7 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     );
 
     if (result != null) {
+      // Reset previous batch results
       setState(() {
         selectedFiles = result.files;
         results = [];
@@ -84,9 +94,12 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     }
   }
 
+  // Process all selected images
   Future<void> processBatch() async {
+    // Prevent duplicate processing
     if (selectedFiles.isEmpty || isProcessing) return;
 
+    // Reset processing state
     setState(() {
       isProcessing = true;
       results = [];
@@ -96,10 +109,10 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     });
 
     try {
-      // 1. Start Session
+      // Create a new batch session on the backend
       sessionId = await predictionService.startBatchSession();
 
-      // 2. Process files in chunks so the backend can run batched inference.
+      // Process files in chunks
       for (
         int start = 0;
         start < selectedFiles.length;
@@ -108,66 +121,92 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
         final end = (start + AppConstants.batchChunkSize < selectedFiles.length)
             ? start + AppConstants.batchChunkSize
             : selectedFiles.length;
+
         final chunk = selectedFiles.sublist(start, end);
+
         final batchInputs = <BatchImageInput>[];
 
+        // Read files in current chunk
         for (final file in chunk) {
           try {
             final bytes = await readSelectedFile(file);
+
             batchInputs.add(BatchImageInput(bytes: bytes, filename: file.name));
           } catch (e) {
+            // Track files that could not be read
             debugPrint('Error reading ${file.name}: $e');
+
             failedFiles.add(file.name);
           }
         }
 
+        // Skip empty chunks
         if (batchInputs.isEmpty) {
           if (!mounted) continue;
+
           setState(() {
             progress = end / selectedFiles.length;
           });
+
           continue;
         }
 
         try {
+          // Send chunk for batch prediction
           final chunkResults = await predictionService.predictBatchImages(
             sessionId!,
             batchInputs,
           );
 
           if (!mounted) continue;
+
           setState(() {
+            // Store prediction results
             for (final result in chunkResults.reversed) {
               results.insert(0, result);
+
+              // Update class counts
               aggregation[result.prediction] =
                   (aggregation[result.prediction] ?? 0) + 1;
             }
+
+            // Update progress bar
             progress = end / selectedFiles.length;
           });
         } catch (e) {
+          // Track failed classifications
           debugPrint('Error classifying chunk $start-$end: $e');
+
           if (!mounted) continue;
+
           setState(() {
             failedFiles.addAll(batchInputs.map((file) => file.filename));
+
             progress = end / selectedFiles.length;
           });
         }
       }
 
+      // Mark batch process as completed
       setState(() {
         isComplete = true;
       });
 
+      // Notify user of failed files
       if (mounted && failedFiles.isNotEmpty) {
         final failureCount = failedFiles.length;
+
         final message = failureCount == 1
             ? '1 file could not be classified.'
             : '$failureCount files could not be classified.';
+
         showMessage(message, backgroundColor: AppColors.warning);
       }
     } catch (e) {
+      // Show batch processing error
       showMessage('Batch Error: $e', backgroundColor: AppColors.error);
     } finally {
+      // Stop loading state
       if (mounted) {
         setState(() {
           isProcessing = false;
@@ -176,33 +215,46 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
     }
   }
 
+  // Read selected file bytes
   Future<Uint8List> readSelectedFile(PlatformFile file) async {
+    // Use in-memory bytes if available
     if (file.bytes != null) {
       return file.bytes!;
     }
 
+    // Handle web platform
     if (kIsWeb) {
       if (file.bytes == null) {
         throw Exception(
           'Missing browser file data for ${file.name}. Please reselect the file.',
         );
       }
+
       return file.bytes!;
     }
 
+    // Get local file path
     final filePath = file.path;
+
     if (filePath == null) {
       throw Exception(
         'Missing local path for ${file.name}. Please reselect the file.',
       );
     }
 
+    // Read file from device storage
     return File(filePath).readAsBytes();
   }
 
+  // Download classified images ZIP file
   Future<void> downloadZip() async {
+    // Ensure a session exists
     if (sessionId == null) return;
+
+    // Request ZIP from backend
     final download = await predictionService.downloadBatchZip(sessionId!);
+
+    // Save ZIP file locally
     final savedPath = await saveDownloadedFile(
       download.bytes,
       download.filename,
@@ -210,16 +262,19 @@ class BatchPredictionPageState extends State<BatchPredictionPage> {
 
     if (!mounted) return;
 
+    // Web download message
     if (kIsWeb) {
       showMessage('ZIP download started.');
       return;
     }
 
+    // Successful save message
     if (savedPath != null) {
       showMessage('ZIP saved to $savedPath');
       return;
     }
 
+    // User cancelled save dialog
     showMessage('ZIP download cancelled.');
   }
 

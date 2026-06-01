@@ -13,41 +13,37 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isCreating = false;
-  final _authController = AuthController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool isCreating = false;
+  final authController = AuthController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  void _handleSignup() async {
-    if (_emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _usernameController.text.isEmpty) {
+  void handleSignup() async {
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
       return;
     }
 
-    setState(() => _isCreating = true);
+    setState(() => isCreating = true);
 
     try {
-      await _authController.signup(
-        _emailController.text.trim(),
-        _passwordController.text,
-        _usernameController.text.trim(),
+      await authController.signup(
+        emailController.text.trim(),
+        passwordController.text,
       );
 
       if (mounted) {
-        setState(() => _isCreating = false);
+        setState(() => isCreating = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created! Please sign in.')),
         );
@@ -55,7 +51,7 @@ class _SignupPageState extends State<SignupPage> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isCreating = false);
+        setState(() => isCreating = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
         );
@@ -120,14 +116,7 @@ class _SignupPageState extends State<SignupPage> {
 
                         // form fields
                         AuthTextField(
-                          controller: _usernameController,
-                          label: 'Username',
-                          hint: 'Enter your username',
-                          icon: Icons.person_outline_rounded,
-                        ),
-                        const SizedBox(height: 24),
-                        AuthTextField(
-                          controller: _emailController,
+                          controller: emailController,
                           label: 'EMAIL',
                           hint: 'name@gmail.com',
                           icon: Icons.email_outlined,
@@ -135,7 +124,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         const SizedBox(height: 24),
                         AuthTextField(
-                          controller: _passwordController,
+                          controller: passwordController,
                           label: 'Password',
                           hint: 'Min. 8 characters',
                           icon: Icons.lock_outline_rounded,
@@ -146,8 +135,8 @@ class _SignupPageState extends State<SignupPage> {
                         // submit button
                         AdaptiveButton(
                           text: 'Request Credentials',
-                          onPressed: _handleSignup,
-                          isLoading: _isCreating,
+                          onPressed: handleSignup,
+                          isLoading: isCreating,
                           width: double.infinity,
                         ),
                         const SizedBox(height: 24),

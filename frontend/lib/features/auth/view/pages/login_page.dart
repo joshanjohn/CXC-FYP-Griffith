@@ -26,7 +26,9 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Handle user login process
   void handleLogin() async {
+    // Validate required fields
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter email and password')),
@@ -34,21 +36,26 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    // Show loading state
     setState(() => isLoggingIn = true);
 
     try {
+      // Authenticate user with email and password
       await authController.login(
         emailController.text.trim(),
         passwordController.text,
       );
 
+      // Navigate to home page after successful login
       if (mounted) {
         setState(() => isLoggingIn = false);
         Navigator.pushReplacementNamed(context, '/');
       }
     } catch (e) {
+      // Display login error message
       if (mounted) {
         setState(() => isLoggingIn = false);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
         );
