@@ -7,6 +7,7 @@ CXC102 = os.path.join(MODEL_DIR, "CXC102.keras")
 CXC103 = os.path.join(MODEL_DIR, "CXC103.keras")
 CXC201 = os.path.join(MODEL_DIR, "CXC201.keras")
 CXC202 = os.path.join(MODEL_DIR, "CXC202.keras")
+CXC203 = os.path.join(MODEL_DIR, "CXC203.keras")
 
 AVAILABLE_MODELS = {
     "cxc101": CXC101,
@@ -14,6 +15,7 @@ AVAILABLE_MODELS = {
     "cxc103": CXC103,
     "cxc201": CXC201,
     "cxc202": CXC202,
+    "cxc203": CXC203,
 }
 
 DEFAULT = os.path.join(MODEL_DIR, DEFAULT_CXC_MODEL)
@@ -24,6 +26,6 @@ DEFAULT_MODEL_ALIAS = next(
         for alias, model_path in AVAILABLE_MODELS.items()
         if os.path.basename(model_path).lower() == DEFAULT_CXC_MODEL.lower()
     ),
-    "cxc201",
+    "cxc203",
 )
 
