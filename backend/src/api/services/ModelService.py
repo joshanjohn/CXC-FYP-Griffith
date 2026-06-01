@@ -4,27 +4,41 @@ from src.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class ModelService:
-    def get_available_models(self):
+    def get_available_models(self) -> list[str]:
         """
-        function to return a list of available model aliases.
+        Return available model aliases with the default model first.
         """
+        # Start list with default model alias
         ordered_aliases = [DEFAULT_MODEL_ALIAS]
+
+        # Add remaining model aliases
         ordered_aliases.extend(
-            alias for alias in AVAILABLE_MODELS.keys() if alias != DEFAULT_MODEL_ALIAS
+            alias for alias in AVAILABLE_MODELS.keys()
+            if alias != DEFAULT_MODEL_ALIAS
         )
+
         return ordered_aliases
 
-    def get_models_info(self):
+    def get_models_info(self) -> list:
         """
-        function to return detailed model metadata for frontend docs.
+        Return model metadata for frontend display and documentation.
         """
+
+        # Store model information records
         models_info = []
+
+        # Process models in display order
         for model_alias in self.get_available_models():
+
+            # Retrieve metadata for the current model
             model_info = MODEL_INFO.get(model_alias)
+
             if model_info is None:
                 continue
 
+            # Add model details with alias and default flag
             models_info.append(
                 {
                     **model_info,
@@ -33,5 +47,7 @@ class ModelService:
                 }
             )
 
+        # Log number of models returned
         logger.debug(f"Resolved {len(models_info)} model info entries")
+
         return models_info

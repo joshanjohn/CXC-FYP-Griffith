@@ -65,7 +65,7 @@ async def predict_xray(
 
 @router.post("/batch/start")
 async def start_batch():
-    """
+    """ 
     POST endpoint for  starting a batch classification session.
     return session id 
     """
@@ -84,18 +84,23 @@ async def predict_batch(
     files: list[UploadFile] = File(...),
     model_name: str = Query(None)
 ):
+    
     """
-    Classify multiple images within a batch session using a single batched inference call.
+    Classify multiple images using a single batch inference request.
     """
+
+    # Get session directory path
     session_dir = os.path.join(TEMP_BASE_DIR, session_id)
 
+    # Ensure session exists
     if not os.path.exists(session_dir):
         raise HTTPException(status_code=404, detail="Session not found")
 
-    # check if the file exist
+    # Ensure files were uploaded
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
 
+    # Load and validate model
     await prediction_service.get_model(model_name)
 
     file_payloads: list[tuple[str | None, bytes]] = []
@@ -108,8 +113,11 @@ async def predict_batch(
         model_name=model_name,
     )
 
+    # Save files into folders based on predicted class
     for (original_filename, contents), result in zip(file_payloads, results):
         predicted_class = result["prediction"]
+
+        # Handle unexpected predictions
         if predicted_class not in CLASS_NAMES:
             predicted_class = "UNKNOWN"
 
@@ -119,37 +127,50 @@ async def predict_batch(
             validate_filename(original_filename),
         )
 
+        # Save file to disk
         with open(file_path, "wb") as f:
             f.write(contents)
 
+    # Return prediction results
     return JSONResponse({"results": results})
 
 @router.get("/batch/download/{session_id}")
 async def download_batch(session_id: str, background_tasks: BackgroundTasks):
     """
-    Zip the batch session results and return for download.
-    Clean up temporary files after download.
+    Create a ZIP file of classified images and return it for download.
+    Temporary files are removed after the download completes.
     """
+
+    # Get session directory path
     session_dir = os.path.join(TEMP_BASE_DIR, session_id)
+
+    # Ensure session exists
     if not os.path.exists(session_dir):
         raise HTTPException(status_code=404, detail="Session not found")
-    
+
+    # Define ZIP file location
     zip_base = os.path.join(TEMP_BASE_DIR, session_id)
     zip_path = f"{zip_base}.zip"
-    
-    # Create zip archive
-    shutil.make_archive(zip_base, 'zip', session_dir)
-    
+
+    # Create ZIP archive from session folder
+    shutil.make_archive(zip_base, "zip", session_dir)
+
+    # Remove temporary files after response is sent
     def cleanup():
+        # Delete session directory
         if os.path.exists(session_dir):
             shutil.rmtree(session_dir)
+
+        # Delete generated ZIP file
         if os.path.exists(zip_path):
             os.remove(zip_path)
-    
+
+    # Schedule cleanup task
     background_tasks.add_task(cleanup)
-    
+
+    # Return ZIP file for download
     return FileResponse(
-        zip_path, 
-        media_type="application/zip", 
+        zip_path,
+        media_type="application/zip",
         filename=f"classified_images_{session_id[:8]}.zip"
     )

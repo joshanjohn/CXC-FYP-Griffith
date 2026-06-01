@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 class PredictionService:
     def __init__(self):
-        # cached model variable 
+        # cached model variable     
         self.model_cache = {}
 
     def resolve_model_alias(self, model_alias: str = None) -> str:
@@ -24,6 +24,7 @@ class PredictionService:
             return DEFAULT_MODEL_ALIAS
 
         model_alias = model_alias.lower()
+         # Validate requested model
         if model_alias not in AVAILABLE_MODELS:
             raise HTTPException(status_code=400, detail=f"Model '{model_alias}' is not available. Available models: {list(AVAILABLE_MODELS.keys())}")
         return model_alias
@@ -32,6 +33,7 @@ class PredictionService:
         """
         Return the preprocessing configuration for a model alias.
         """
+        # Retrieve preprocessing configuration
         return MODEL_PREPROCESSING_UNITS.get(
             model_alias,
             {
@@ -48,6 +50,8 @@ class PredictionService:
         """
         for multiple uploaded images in a single batched predict call.
         """
+
+         # Resolve and validate model name
         resolved_model_name = self.resolve_model_alias(model_name)
         logger.info(
            f"Running batch prediction with model {resolved_model_name} for {len(files)} files.",
@@ -65,7 +69,9 @@ class PredictionService:
             processed_images = []
             filenames = []
 
+             # Preprocess all uploaded images
             for filename, contents in files:
+                # Validate file content
                 if not contents:
                     raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
@@ -79,7 +85,9 @@ class PredictionService:
                 processed_images.append(img_array[0])
                 filenames.append(filename)
 
+            # Create a single batch for inference
             batch_array = np.stack(processed_images, axis=0)
+            # Run prediction on the entire batch
             prediction_probs_batch = model.predict(batch_array, verbose=0)
 
             results = []
@@ -102,15 +110,18 @@ class PredictionService:
                     }
                 )
 
-
                 logger.info(f"Prediction completed with model {resolved_model_name}: \nclass={predicted_class} confidence={confidence} filename={filenames[index]}",)
 
 
             return results
         except HTTPException:
             raise
+
+        # Handle invalid image files
         except UnidentifiedImageError:
             raise HTTPException(status_code=400, detail="Unsupported or invalid image file")
+        
+        # Handle unexpected errors
         except Exception as e:
             logger.exception("Batch prediction error: %s", e)
             raise HTTPException(status_code=500, detail=str(e))
@@ -120,9 +131,12 @@ class PredictionService:
         return a model using its alias or model name. If no alias is provided, it use the default model (DEFAULT).
         """
         model_key = self.resolve_model_alias(model_alias)
+
+        # Determine model file path
         model_path = DEFAULT if model_key == DEFAULT_MODEL_ALIAS else AVAILABLE_MODELS[model_key]
         preprocessing_unit = self.get_model_preprocessing_unit(model_key)
 
+        # Load model only once and cache it
         if model_key not in self.model_cache:
             try:
                 logger.info(f"Loading model {model_key} from {model_path}")
@@ -145,11 +159,15 @@ class PredictionService:
         model = await self.get_model(resolved_model_name)
 
         try:
+             # Read uploaded file
             contents = await file.read()
+
             if not contents:
                 raise HTTPException(status_code=400, detail="Uploaded file is empty")
             pil_image = Image.open(io.BytesIO(contents))
             pil_image.load()
+
+            # Preprocess image for inference
             img_array = ImageUtils.preprocess_image_for_model(
                 pil_image,
                 model,
@@ -163,7 +181,7 @@ class PredictionService:
             predicted_class = CLASS_NAMES[predicted_class_idx]
             confidence = float(prediction_probs[predicted_class_idx])
 
-            # Create a dictionary of all class confidences
+             # Store confidence for all classes
             all_confidences = {CLASS_NAMES[i]: float(prediction_probs[i]) for i in range(len(CLASS_NAMES))}
 
             logger.info(f"Prediction completed with model {resolved_model_name}: \nclass={predicted_class} confidence={confidence} filename={file.filename}",)

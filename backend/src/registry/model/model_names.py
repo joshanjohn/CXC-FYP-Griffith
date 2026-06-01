@@ -20,6 +20,7 @@ AVAILABLE_MODELS = {
 
 DEFAULT = os.path.join(MODEL_DIR, DEFAULT_CXC_MODEL)
 
+# Find the alias that matches the configured default model
 DEFAULT_MODEL_ALIAS = next(
     (
         alias

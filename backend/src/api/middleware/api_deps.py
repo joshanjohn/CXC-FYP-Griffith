@@ -8,6 +8,7 @@ security = HTTPBearer(auto_error=True)
 
 
 def verifyWithGooglePublicKeys(token: str):
+    # method to verify the google public token 
     return id_token.verify_firebase_token(
         token,
         google_requests.Request(),
@@ -20,6 +21,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     """
     token = credentials.credentials
     try:
+        #  Verify the token before allowing access to protected API endpoints.
         decodedToken = verifyWithGooglePublicKeys(token)
         return decodedToken
     except Exception as e:
