@@ -1,0 +1,32 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Backend repo for FYP"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.135.1",
+    "ipykernel",
+    "keras-tuner>=1.4.8",
+    "matplotlib",
+    "numpy",
+    "passlib[argon2,bcrypt]>=1.7.4",
+    "pillow>=12.1.0",
+    "polars",
+    "pydantic[email]>=2.12.5",
+    "pymongo>=4.16.0",
+    "python-dotenv",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.22",
+    "scikit-learn",
+    "seaborn",
+    "streamlit>=1.54.0",
+    "tabulate",
+    "tensorflow==2.16.1",
+    "uvicorn>=0.41.0",
+    "watchdog>=6.0.0",
+    "firebase-admin>=6.5.0",
+    "mlflow>=3.12.0",
+    "tensorboard>=2.16.2",
+    "setuptools<82.0.0",
+]
