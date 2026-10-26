@@ -12,7 +12,7 @@ Hi there! Welcome to **CXC** (Chest X-ray Classifier), my Final Year Project for
 
 CXC is an AI-powered diagnostic assistant designed to help classify chest X-rays into **Normal**, **Pneumonia**, and **Tuberculosis**, while being smart enough to flag non-X-ray images as **Unknown**. It pairs deep learning models trained on over 21,000 images with a responsive, cross-platform Flutter app and a FastAPI backend.
 
-> 📖 Looking for the full research paper, mathematical breakdowns, and training curves? Check out the complete [Thesis Documentation](docs/thesis-documentation.md).
+> 📖 Looking for the full research paper, mathematical breakdowns, and training curves? Check out the complete [Thesis Documentation](docs/Joshan_John_3092883_SDP_doc.pdf).
 
 ---
 
